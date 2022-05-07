@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+# consul installed before configuration
+while [ ! -f /usr/bin/consul ]; do sleep 1; done
+
+# empty default config
+echo "" | tee /etc/consul.d/consul.hcl
+
 # consul client
 tee /etc/consul.d/consul.hcl > /dev/null <<EOF
 # consul client config
@@ -10,6 +16,7 @@ bind_addr = "{{ GetInterfaceIP \"ens5\" }}"
 client_addr = "0.0.0.0"
 
 server = false
+raft_protocol = 3
 
 retry_join = ["provider=${provider} region=${provider_region} tag_key=${consul_tag_key} tag_value=${consul_tag_value}"]
 retry_max = 5

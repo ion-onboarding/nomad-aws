@@ -42,12 +42,23 @@ resource "aws_security_group" "load_balancer" {
   )
 }
 
-resource "aws_security_group_rule" "load_balancer_allow_80" {
+resource "aws_security_group_rule" "load_balancer_allow_consul" {
   security_group_id = aws_security_group.load_balancer.id
   type              = "ingress"
   protocol          = "tcp"
-  from_port         = 80
-  to_port           = 80
+  from_port         = 8500
+  to_port           = 8500
+  cidr_blocks       = var.allowed_traffic_cidr_blocks
+  ipv6_cidr_blocks  = length(var.allowed_traffic_cidr_blocks_ipv6) > 0 ? var.allowed_traffic_cidr_blocks_ipv6 : null
+  description       = "Allow HTTP traffic."
+}
+
+resource "aws_security_group_rule" "load_balancer_allow_nomad" {
+  security_group_id = aws_security_group.load_balancer.id
+  type              = "ingress"
+  protocol          = "tcp"
+  from_port         = 4646
+  to_port           = 4646
   cidr_blocks       = var.allowed_traffic_cidr_blocks
   ipv6_cidr_blocks  = length(var.allowed_traffic_cidr_blocks_ipv6) > 0 ? var.allowed_traffic_cidr_blocks_ipv6 : null
   description       = "Allow HTTP traffic."
@@ -64,7 +75,7 @@ resource "aws_security_group_rule" "load_balancer_allow_outbound" {
   description       = "Allow any outbound traffic."
 }
 
-## Nomad & Client SG
+# ANY ANY SG, try to avoid
 resource "aws_security_group" "any" {
   name_prefix = "${var.main_project_tag}-any-sg"
   description = "Firewall for the nomad & client instance"
