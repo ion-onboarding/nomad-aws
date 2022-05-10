@@ -20,9 +20,9 @@ locals {
   ] : null
 }
 
-# output "SSH_bation" {
-#   value = local.SSH_bastion
-# }
+output "SSH_bation" {
+  value = local.SSH_bastion
+}
 
 output "SSH_nomad" {
   value = local.SSH_nomad
@@ -40,23 +40,18 @@ output "SSH_client" {
   value = local.SSH_client
 }
 
-# output "WWW_alb_consul" {
-#   value = "http://${aws_lb.alb_consul.dns_name}"
-# }
+output "CONSUL_HTTP_ADDR" {
+  value = " export CONSUL_HTTP_ADDR='http://${aws_lb.alb_api.dns_name}:8500' "
+}
 
-# output "WWW_alb_nomad" {
-#   value = "http://${aws_lb.alb_nomad.dns_name}"
-# }
+output "NOMAD_ADDR" {
+  value = " export NOMAD_ADDR='http://${aws_lb.alb_api.dns_name}:4646' "
+}
 
+output "VAULT_ADDR" {
+  value = " export VAULT_ADDR='http://${aws_lb.alb_api.dns_name}:8200' "
+}
 
-# output "CONSUL_HTTP_ADDR" {
-#   value = "export CONSUL_HTTP_ADDR=http://${aws_lb.alb_consul.dns_name}:80"
-# }
-
-# output "NOMAD_ADDR" {
-#   value = "export NOMAD_ADDR=http://${aws_lb.alb_nomad.dns_name}:80"
-# }
-
-output "WWW_alb_api" {
-  value = "http://${aws_lb.alb_api.dns_name}"
+output "VAULT_GUI_user_password" {
+  value = "admin/admin"
 }

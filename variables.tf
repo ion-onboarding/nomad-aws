@@ -71,7 +71,7 @@ variable "allowed_traffic_cidr_blocks_ipv6" {
 ## Nomad Variables
 variable "nomad_instances_count" {
   description = "How many servers must come online"
-  default     = 3
+  default     = 1
 }
 
 variable "nomad_region" {

@@ -104,6 +104,14 @@ locals {
     consul_tag_value  = var.main_project_tag
   }
 
+  vault_vars_vault = {
+    provider        = "aws"
+    provider_region = var.aws_default_region
+    vault_tag_key   = "Project"
+    vault_tag_value = var.main_project_tag
+    kms_key         = "${aws_kms_key.vault.id}"
+  }
+
   vault_cloud_init = <<-EOT
 MIME-Version: 1.0
 Content-Type: multipart/mixed; boundary="MIMEBOUNDARY"
@@ -131,6 +139,10 @@ ${file("./scripts/install-bash-env-vault.sh")}
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
 ${templatefile("./scripts/config-consul-client.sh", local.vault_vars_consul)}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${templatefile("./scripts/config-vault-server.sh", local.vault_vars_vault)}
 EOT
 }
 
@@ -193,5 +205,4 @@ ${templatefile("./scripts/config-consul-client.sh", local.client_vars_consul)}
 Content-Type: text/x-shellscript
 ${templatefile("./scripts/config-nomad-client.sh", local.client_vars_nomad)}
 EOT
-
 }

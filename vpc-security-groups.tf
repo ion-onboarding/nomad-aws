@@ -53,6 +53,17 @@ resource "aws_security_group_rule" "load_balancer_allow_consul" {
   description       = "Allow HTTP traffic."
 }
 
+resource "aws_security_group_rule" "load_balancer_allow_vault" {
+  security_group_id = aws_security_group.load_balancer.id
+  type              = "ingress"
+  protocol          = "tcp"
+  from_port         = 8200
+  to_port           = 8200
+  cidr_blocks       = var.allowed_traffic_cidr_blocks
+  ipv6_cidr_blocks  = length(var.allowed_traffic_cidr_blocks_ipv6) > 0 ? var.allowed_traffic_cidr_blocks_ipv6 : null
+  description       = "Allow HTTP traffic."
+}
+
 resource "aws_security_group_rule" "load_balancer_allow_nomad" {
   security_group_id = aws_security_group.load_balancer.id
   type              = "ingress"

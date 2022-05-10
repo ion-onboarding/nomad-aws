@@ -16,7 +16,7 @@ resource "aws_lb" "alb_api" {
 ## Listener
 resource "aws_lb_listener" "alb_consul" {
   load_balancer_arn = aws_lb.alb_api.arn
-  port              = 8500
+  port              = 8500 # consul
   protocol          = "HTTP"
 
   default_action {
@@ -27,7 +27,7 @@ resource "aws_lb_listener" "alb_consul" {
 
 resource "aws_lb_listener" "alb_nomad" {
   load_balancer_arn = aws_lb.alb_api.arn
-  port              = 4646
+  port              = 4646 # nomad
   protocol          = "HTTP"
 
   default_action {
@@ -38,19 +38,19 @@ resource "aws_lb_listener" "alb_nomad" {
 
 resource "aws_lb_listener" "alb_vault" {
   load_balancer_arn = aws_lb.alb_api.arn
-  port              = 8200
+  port              = 8200 # vault
   protocol          = "HTTP"
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.alb_targets_nomad.arn
+    target_group_arn = aws_lb_target_group.alb_targets_vault.arn
   }
 }
 
 ## Target Group
 resource "aws_lb_target_group" "alb_targets_consul" {
   name_prefix          = "csul-"
-  port                 = 8500
+  port                 = 8500 # consul
   protocol             = "HTTP"
   vpc_id               = aws_vpc.vpc.id
   deregistration_delay = 30
@@ -75,8 +75,8 @@ resource "aws_lb_target_group" "alb_targets_consul" {
 }
 
 resource "aws_lb_target_group" "alb_targets_nomad" {
-  name_prefix          = "csul-"
-  port                 = 4646
+  name_prefix          = "nomd-"
+  port                 = 4646 # nomad
   protocol             = "HTTP"
   vpc_id               = aws_vpc.vpc.id
   deregistration_delay = 30
@@ -101,24 +101,24 @@ resource "aws_lb_target_group" "alb_targets_nomad" {
 }
 
 resource "aws_lb_target_group" "alb_targets_vault" {
-  name_prefix          = "vlt-"
-  port                 = 8200
+  name_prefix          = "vault-"
+  port                 = 8200 # vault
   protocol             = "HTTP"
   vpc_id               = aws_vpc.vpc.id
   deregistration_delay = 30
   target_type          = "instance"
 
   # https://www.vaultproject.io/api-docs/system/leader
-  health_check {
-    enabled             = true
-    interval            = 10
-    path                = "/v1/sys/leader"    // the API health port?
-    protocol            = "HTTP"              // switch to HTTPS?
-    timeout             = 5
-    healthy_threshold   = 3
-    unhealthy_threshold = 3
-    matcher             = "200"
-  }
+  # health_check {
+  #   enabled             = true
+  #   interval            = 10
+  #   path                = "/v1/sys/leader"    // the API health port?
+  #   protocol            = "HTTP"              // switch to HTTPS?
+  #   timeout             = 5
+  #   healthy_threshold   = 3
+  #   unhealthy_threshold = 3
+  #   matcher             = "200"
+  # }
 
   tags = merge(
     { "Name" = "${var.main_project_tag}-tg-vault" },

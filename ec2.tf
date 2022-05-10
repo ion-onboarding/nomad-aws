@@ -54,11 +54,11 @@ resource "aws_instance" "vault" {
   key_name               = aws_key_pair.public_key.id
   vpc_security_group_ids = [aws_security_group.any.id]
   subnet_id              = element(aws_subnet.private[*].id, count.index) # first instance 1st AZ, 2nd instance 2nd AZ etc
-  iam_instance_profile   = aws_iam_instance_profile.cloud-auto-join.name
+  iam_instance_profile   = aws_iam_instance_profile.vault.name
 
   tags = merge(
     { "Name" = "${var.main_project_tag}-vault" },
-    { "Project" = var.main_project_tag }
+    { "Project" = "${var.main_project_tag}-vault" }
   )
 
   user_data = local.vault_cloud_init

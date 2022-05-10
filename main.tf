@@ -15,3 +15,14 @@ resource "aws_key_pair" "public_key" {
     { "Project" = var.main_project_tag }
   )
 }
+
+resource "aws_kms_key" "vault" {
+  description         = "unseal vault"
+  enable_key_rotation = false
+  is_enabled          = true
+
+  tags = merge(
+    { "Name" = "${var.main_project_tag}-unseal-vault" },
+    { "Project" = var.main_project_tag }
+  )
+}
