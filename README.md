@@ -31,17 +31,22 @@ terraform plan
 terraform apply
 ```
 
+## How to connect?
+- use terraform output to get:
+  - SSH details
+  - URL to access GUI
+  - ENV variables
+```
+terraform output
+```
+
 ## Destroy infrastructure
 - destroy resources
 ```
 terraform destroy
 ```
 
-## How to connect?
-- use terraform output to get the SSH details
-```
-terraform output
-```
+# Server details
 
 ## Consul
 - members
@@ -68,4 +73,20 @@ nomad node status
 - raft peers
 ```
 nomad operator raft list-peers
+```
+
+## Vault
+- GUI user password
+```
+username: admin
+password: admin
+```
+- status
+```
+vault status
+```
+
+- login on the CLI
+```
+vault login -method=userpass username=admin password=admin
 ```

@@ -105,10 +105,7 @@ locals {
   }
 
   vault_vars_vault = {
-    provider        = "aws"
     provider_region = var.aws_default_region
-    vault_tag_key   = "Project"
-    vault_tag_value = var.main_project_tag
     kms_key         = "${aws_kms_key.vault.id}"
   }
 

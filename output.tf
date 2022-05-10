@@ -18,6 +18,11 @@ locals {
   SSH_client = var.bastion_enable ? [for client in aws_instance.client :
     "ssh -i ${local.private_key} -o StrictHostKeyChecking=no -J ubuntu@${aws_instance.bastion[0].public_ip} ubuntu@${client.private_ip}"
   ] : null
+
+  CONSUL_HTTP_ADDR        = " export CONSUL_HTTP_ADDR='http://${aws_lb.alb_api.dns_name}:8500' "
+  NOMAD_ADDR              = " export NOMAD_ADDR='http://${aws_lb.alb_api.dns_name}:4646' "
+  VAULT_ADDR              = " export VAULT_ADDR='http://${aws_lb.alb_api.dns_name}:8200' "
+  VAULT_GUI_user_password = "admin/admin"
 }
 
 output "SSH_bation" {
@@ -41,17 +46,17 @@ output "SSH_client" {
 }
 
 output "CONSUL_HTTP_ADDR" {
-  value = " export CONSUL_HTTP_ADDR='http://${aws_lb.alb_api.dns_name}:8500' "
+  value = local.CONSUL_HTTP_ADDR
 }
 
 output "NOMAD_ADDR" {
-  value = " export NOMAD_ADDR='http://${aws_lb.alb_api.dns_name}:4646' "
+  value = local.NOMAD_ADDR
 }
 
 output "VAULT_ADDR" {
-  value = " export VAULT_ADDR='http://${aws_lb.alb_api.dns_name}:8200' "
+  value = local.VAULT_ADDR
 }
 
 output "VAULT_GUI_user_password" {
-  value = "admin/admin"
+  value = local.VAULT_GUI_user_password
 }

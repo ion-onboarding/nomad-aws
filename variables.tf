@@ -11,6 +11,10 @@ variable "aws_default_region" {
   default     = "eu-north-1"
 }
 
+#
+# VPC
+#
+
 ## VPC Variables
 variable "vpc_cidr" {
   description = "Cidr block for the VPC.  Using a /16 or /20 Subnet Mask is recommended."
@@ -68,6 +72,10 @@ variable "allowed_traffic_cidr_blocks_ipv6" {
   default     = ["::/0"]
 }
 
+#
+# EC2
+#
+
 ## Nomad Variables
 variable "nomad_instances_count" {
   description = "How many servers must come online"
@@ -91,7 +99,7 @@ variable "nomad_instance_type" {
 
 ## Consul Variables
 variable "consul_instances_count" {
-  description = "How many servers must come online"
+  description = "How many servers must come online. At this moment count cannot be changed"
   default     = 1
 }
 
@@ -131,5 +139,5 @@ variable "client_instances_count" {
 variable "bastion_enable" {
   description = "Enable or Disable bastion: true or false"
   type        = bool
-  default     = "true"
+  default     = "false"
 }
