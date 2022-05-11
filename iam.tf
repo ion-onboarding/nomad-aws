@@ -2,9 +2,9 @@
 # Nomad, Consul
 #
 resource "random_pet" "env_cloud_auto_join" {
-  length = 1
+  length    = 1
   separator = "-"
-  prefix      = var.main_project_tag
+  prefix    = var.main_project_tag
 }
 
 resource "aws_iam_instance_profile" "cloud_auto_join" {
@@ -35,9 +35,9 @@ data "aws_iam_policy_document" "who_can_use" {
 
 # creates IAM policy for cluster discovery
 resource "aws_iam_role_policy" "what_can_do_cluster_discovery" {
-  name_prefix   = random_pet.env_cloud_auto_join.id
-  role   = aws_iam_role.auto_join.id
-  policy = data.aws_iam_policy_document.what_can_do_cluster_discovery.json
+  name_prefix = random_pet.env_cloud_auto_join.id
+  role        = aws_iam_role.auto_join.id
+  policy      = data.aws_iam_policy_document.what_can_do_cluster_discovery.json
 }
 
 # creates IAM policy document for linking to above policy as JSON
@@ -57,9 +57,9 @@ data "aws_iam_policy_document" "what_can_do_cluster_discovery" {
 # Vault
 #
 resource "random_pet" "env_unseal_cloud_auto_join" {
-  length = 1
-    separator = "-"
-  prefix      = var.main_project_tag
+  length    = 1
+  separator = "-"
+  prefix    = var.main_project_tag
 }
 
 resource "aws_iam_instance_profile" "unseal_cloud_auto_join" {
@@ -90,9 +90,9 @@ data "aws_iam_policy_document" "who_can_use_vault" {
 
 # creates IAM policy for cluster discovery
 resource "aws_iam_role_policy" "what_can_do_vault_cluster_discovery" {
-  name_prefix   = random_pet.env_unseal_cloud_auto_join.id
-  role   = aws_iam_role.unseal_cloud_auto_join.id
-  policy = data.aws_iam_policy_document.what_can_do_vault_cluster_discovery.json
+  name_prefix = random_pet.env_unseal_cloud_auto_join.id
+  role        = aws_iam_role.unseal_cloud_auto_join.id
+  policy      = data.aws_iam_policy_document.what_can_do_vault_cluster_discovery.json
 }
 
 # creates IAM policy document for linking to above policy as JSON
@@ -110,9 +110,9 @@ data "aws_iam_policy_document" "what_can_do_vault_cluster_discovery" {
 
 # creates IAM policy for unsealing vault
 resource "aws_iam_role_policy" "what_can_do_vault_unseal" {
-  name_prefix   = random_pet.env_unseal_cloud_auto_join.id
-  role   = aws_iam_role.unseal_cloud_auto_join.id
-  policy = data.aws_iam_policy_document.what_can_do_vault_unseal.json
+  name_prefix = random_pet.env_unseal_cloud_auto_join.id
+  role        = aws_iam_role.unseal_cloud_auto_join.id
+  policy      = data.aws_iam_policy_document.what_can_do_vault_unseal.json
 }
 
 # creates IAM policy document for linking to above policy as JSON

@@ -75,6 +75,28 @@ resource "aws_security_group_rule" "load_balancer_allow_nomad" {
   description       = "Allow HTTP traffic."
 }
 
+resource "aws_security_group_rule" "load_balancer_allow_traefik" {
+  security_group_id = aws_security_group.load_balancer.id
+  type              = "ingress"
+  protocol          = "tcp"
+  from_port         = 8080
+  to_port           = 8080
+  cidr_blocks       = var.allowed_traffic_cidr_blocks
+  ipv6_cidr_blocks  = length(var.allowed_traffic_cidr_blocks_ipv6) > 0 ? var.allowed_traffic_cidr_blocks_ipv6 : null
+  description       = "Allow HTTP traffic."
+}
+
+resource "aws_security_group_rule" "load_balancer_allow_traefik_app" {
+  security_group_id = aws_security_group.load_balancer.id
+  type              = "ingress"
+  protocol          = "tcp"
+  from_port         = 80
+  to_port           = 80
+  cidr_blocks       = var.allowed_traffic_cidr_blocks
+  ipv6_cidr_blocks  = length(var.allowed_traffic_cidr_blocks_ipv6) > 0 ? var.allowed_traffic_cidr_blocks_ipv6 : null
+  description       = "Allow HTTP traffic."
+}
+
 resource "aws_security_group_rule" "load_balancer_allow_outbound" {
   security_group_id = aws_security_group.load_balancer.id
   type              = "egress"

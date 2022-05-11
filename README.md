@@ -59,6 +59,22 @@ consul members
 consul operator raft list-peers
 ```
 
+## Vault
+- GUI user password
+```
+username: admin
+password: admin
+```
+- status
+```
+vault status
+```
+
+- login on the CLI
+```
+vault login -method=userpass username=admin password=admin
+```
+
 ## Nomad
 - servers
 ```
@@ -75,18 +91,18 @@ nomad node status
 nomad operator raft list-peers
 ```
 
-## Vault
-- GUI user password
+## Nomad workloads
+- run a job, which is a web server
 ```
-username: admin
-password: admin
-```
-- status
-```
-vault status
+nomad job run examples/web-traefik.nomad
 ```
 
-- login on the CLI
+- output URL of LoadBalancer
 ```
-vault login -method=userpass username=admin password=admin
+terraform output URL_LoadBalancer
+```
+
+- access the web server
+```
+http://<URL_LoadBalancer>/web
 ```

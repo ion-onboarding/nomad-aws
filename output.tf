@@ -19,10 +19,17 @@ locals {
     "ssh -i ${local.private_key} -o StrictHostKeyChecking=no -J ubuntu@${aws_instance.bastion[0].public_ip} ubuntu@${client.private_ip}"
   ] : null
 
+  SSH_traefik = var.bastion_enable ? [for traefik in aws_instance.traefik :
+    "ssh -i ${local.private_key} -o StrictHostKeyChecking=no -J ubuntu@${aws_instance.bastion[0].public_ip} ubuntu@${traefik.private_ip}"
+  ] : null
+
   CONSUL_HTTP_ADDR        = " export CONSUL_HTTP_ADDR='http://${aws_lb.alb_api.dns_name}:8500' "
   NOMAD_ADDR              = " export NOMAD_ADDR='http://${aws_lb.alb_api.dns_name}:4646' "
   VAULT_ADDR              = " export VAULT_ADDR='http://${aws_lb.alb_api.dns_name}:8200' "
   VAULT_GUI_user_password = "admin/admin"
+  WWW_TRAEFIK             = "http://${aws_lb.alb_api.dns_name}:8080"
+  CURL_app                = "curl -H 'Host: example.com' ${aws_lb.alb_api.dns_name}"
+  URL_LoadBalancer        = aws_lb.alb_api.dns_name
 }
 
 output "SSH_bation" {
@@ -45,6 +52,10 @@ output "SSH_client" {
   value = local.SSH_client
 }
 
+output "SSH_traefik" {
+  value = local.SSH_traefik
+}
+
 output "CONSUL_HTTP_ADDR" {
   value = local.CONSUL_HTTP_ADDR
 }
@@ -59,4 +70,16 @@ output "VAULT_ADDR" {
 
 output "VAULT_GUI_user_password" {
   value = local.VAULT_GUI_user_password
+}
+
+output "WWW_TRAEFIK" {
+  value = local.WWW_TRAEFIK
+}
+
+output "CURL_app" {
+  value = local.CURL_app
+}
+
+output "URL_LoadBalancer" {
+  value = local.URL_LoadBalancer
 }

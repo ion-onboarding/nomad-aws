@@ -39,7 +39,9 @@ with Diagram("ingress", filename="ingress", direction="TB",outformat=outformat, 
                 consul1_global = Consul("consul")
                 nomad1_global = Nomad("nomad")
                 vault1_global = Vault("vault")
+                traefik1_global = Traefik("traefik")
             with Cluster("NOMAD DATACENTER dc1"):
                 client1 = Nomad("client")
                 dns >> Edge(lhead="cluster_SUBNET public", color="blue") >> [lb_servers]
-                lb_servers >> Edge(ltail="cluster_SUBNET public", lhead="cluster_SERVERS", minlen="1", color="blue") >> [consul1_global, nomad1_global, vault1_global]
+                lb_servers >> Edge(ltail="cluster_SUBNET public", lhead="cluster_SERVERS", minlen="1", color="blue") >> [consul1_global, nomad1_global, vault1_global, traefik1_global]
+                traefik1_global >> Edge(ltail="cluster_SERVERS", lhead="cluster_NOMAD DATACENTER dc1", minlen="2", color="blue") >> client1

@@ -14,6 +14,8 @@ data_dir = "/opt/nomad"
 
 bind_addr = "{{ GetInterfaceIP \"ens5\" }}"
 
+leave_on_terminate = true
+
 server {
   enabled = true
   raft_protocol = 3
@@ -29,6 +31,11 @@ server {
 consul {
   address = "127.0.0.1:8500"
 }
+
+# vault {
+#   enabled = true
+#   address = "http://1.2.3.4:8200"
+# }
 EOF
 
 # start nomad

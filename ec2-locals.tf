@@ -203,3 +203,44 @@ Content-Type: text/x-shellscript
 ${templatefile("./scripts/config-nomad-client.sh", local.client_vars_nomad)}
 EOT
 }
+
+## traefik cloud init
+locals {
+  traefik_vars_consul = {
+    provider          = "aws"
+    provider_region   = var.aws_default_region
+    consul_datacenter = var.consul_datacenter
+    consul_tag_key    = "Project"
+    consul_tag_value  = var.main_project_tag
+  }
+
+  traefik_cloud_init = <<-EOT
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="MIMEBOUNDARY"
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./scripts/install-hashicorp-repository.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./scripts/install-consul.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./scripts/install-bash-env-consul.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./scripts/install-traefik.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${templatefile("./scripts/config-consul-client.sh", local.traefik_vars_consul)}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./scripts/config-traefik.sh")}
+
+EOT
+}
