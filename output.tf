@@ -27,8 +27,7 @@ locals {
   NOMAD_ADDR              = " export NOMAD_ADDR='http://${aws_lb.alb_api.dns_name}:4646' "
   VAULT_ADDR              = " export VAULT_ADDR='http://${aws_lb.alb_api.dns_name}:8200' "
   VAULT_GUI_user_password = "admin/admin"
-  WWW_TRAEFIK             = "http://${aws_lb.alb_api.dns_name}:8080"
-  CURL_app                = "curl -H 'Host: example.com' ${aws_lb.alb_api.dns_name}"
+  WWW_TRAEFIK_dashboard   = "http://${aws_lb.alb_api.dns_name}:8080"
   URL_LoadBalancer        = aws_lb.alb_api.dns_name
 }
 
@@ -72,12 +71,8 @@ output "VAULT_GUI_user_password" {
   value = local.VAULT_GUI_user_password
 }
 
-output "WWW_TRAEFIK" {
-  value = local.WWW_TRAEFIK
-}
-
-output "CURL_app" {
-  value = local.CURL_app
+output "WWW_TRAEFIK_dashboard" {
+  value = local.WWW_TRAEFIK_dashboard
 }
 
 output "URL_LoadBalancer" {
