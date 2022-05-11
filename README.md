@@ -31,17 +31,22 @@ terraform plan
 terraform apply
 ```
 
+## How to connect?
+- use terraform output to get:
+  - SSH details
+  - URL to access GUI
+  - ENV variables
+```
+terraform output
+```
+
 ## Destroy infrastructure
 - destroy resources
 ```
 terraform destroy
 ```
 
-## How to connect?
-- use terraform output to get the SSH details
-```
-terraform output
-```
+# Server details
 
 ## Consul
 - members
@@ -52,6 +57,22 @@ consul members
 - raft peers
 ```
 consul operator raft list-peers
+```
+
+## Vault
+- GUI user password
+```
+username: admin
+password: admin
+```
+- status
+```
+vault status
+```
+
+- login on the CLI
+```
+vault login -method=userpass username=admin password=admin
 ```
 
 ## Nomad
@@ -68,4 +89,20 @@ nomad node status
 - raft peers
 ```
 nomad operator raft list-peers
+```
+
+## Nomad workloads
+- run a job, which is a web server
+```
+nomad job run examples/web-traefik.nomad
+```
+
+- output URL of LoadBalancer
+```
+terraform output URL_LoadBalancer
+```
+
+- access the web server
+```
+http://<URL_LoadBalancer>/web
 ```

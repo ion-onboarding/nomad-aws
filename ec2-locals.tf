@@ -1,180 +1,246 @@
-## Consul cloud init
+## consul cloud init
 locals {
-  consul_cloud_init_parts = [
-    {
-      filepath     = "./scripts/install-hashicorp-repository.sh"
-      content-type = "text/cloud-boothook"
-      vars         = {}
-    },
-    {
-      filepath     = "./scripts/install-consul.sh"
-      content-type = "text/cloud-boothook"
-      vars         = {}
-    },
-    {
-      filepath     = "./scripts/install-bash-environment.sh"
-      content-type = "text/x-shellscript"
-      vars         = {}
-    },
-    {
-      filepath     = "./scripts/config-consul-server.sh"
-      content-type = "text/x-shellscript"
-      vars = {
-        provider          = "aws"
-        provider_region   = var.aws_default_region
-        consul_bootstrap  = var.consul_instances_count
-        consul_datacenter = var.consul_datacenter
-        consul_tag_key    = "Project"
-        consul_tag_value  = var.main_project_tag
-      }
-    },
-  ]
+  consul_vars_consul = {
+    provider          = "aws"
+    provider_region   = var.aws_default_region
+    consul_bootstrap  = var.consul_instances_count
+    consul_datacenter = var.consul_datacenter
+    consul_tag_key    = "Project"
+    consul_tag_value  = var.main_project_tag
+  }
 
-  consul_cloud_init_parts_rendered = [for part in local.consul_cloud_init_parts : <<-EOF
-            --MIMEBOUNDARY
-            Content-Transfer-Encoding: 7bit
-            Content-Type: ${part.content-type}
-            Mime-Version: 1.0
+  consul_cloud_init = <<-EOT
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="MIMEBOUNDARY"
 
-            ${templatefile(part.filepath, part.vars)}
-            EOF
-  ]
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./scripts/install-hashicorp-repository.sh")}
 
-  consul_cloud_init_gzip = base64gzip(templatefile("./scripts/cloud-init.tftpl", { cloud_init_parts = local.consul_cloud_init_parts_rendered }))
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./scripts/install-consul.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./scripts/install-nomad.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./scripts/install-bash-env-consul.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./scripts/install-bash-env-nomad.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${templatefile("./scripts/config-consul-server.sh", local.consul_vars_consul)}
+EOT
 }
 
-## Nomad cloud init
+## nomad clount init
 locals {
-  nomad_cloud_init_parts = [
-    {
-      filepath     = "./scripts/install-hashicorp-repository.sh"
-      content-type = "text/cloud-boothook"
-      vars         = {}
-    },
-    {
-      filepath     = "./scripts/install-consul.sh"
-      content-type = "text/cloud-boothook"
-      vars         = {}
-    },
-    {
-      filepath     = "./scripts/install-nomad.sh"
-      content-type = "text/cloud-boothook"
-      vars         = {}
-    },
-    {
-      filepath     = "./scripts/install-bash-environment.sh"
-      content-type = "text/x-shellscript"
-      vars         = {}
-    },
-    {
-      filepath     = "./scripts/install-bash-environment.sh"
-      content-type = "text/x-shellscript"
-      vars         = {}
-    },
-    {
-      filepath     = "./scripts/config-consul-client.sh"
-      content-type = "text/x-shellscript"
-      vars = {
-        provider          = "aws"
-        provider_region   = var.aws_default_region
-        consul_datacenter = var.consul_datacenter
-        consul_tag_key    = "Project"
-        consul_tag_value  = var.main_project_tag
-      }
-    },
-    {
-      filepath     = "./scripts/config-nomad-server.sh"
-      content-type = "text/x-shellscript"
-      vars = {
-        provider         = "aws"
-        provider_region  = var.aws_default_region
-        nomad_bootstrap  = var.nomad_instances_count
-        nomad_region     = var.nomad_region
-        nomad_datacenter = var.nomad_datacenter
-        nomad_tag_key    = "Project"
-        nomad_tag_value  = var.main_project_tag
-      }
-    },
-  ]
+  nomad_vars_consul = {
+    provider          = "aws"
+    provider_region   = var.aws_default_region
+    consul_datacenter = var.consul_datacenter
+    consul_tag_key    = "Project"
+    consul_tag_value  = var.main_project_tag
+  }
 
-  nomad_cloud_init_parts_rendered = [for part in local.nomad_cloud_init_parts : <<-EOF
-            --MIMEBOUNDARY
-            Content-Transfer-Encoding: 7bit
-            Content-Type: ${part.content-type}
-            Mime-Version: 1.0
-            ${templatefile(part.filepath, part.vars)}
-            EOF
-  ]
+  nomad_vars_nomad = {
+    provider         = "aws"
+    provider_region  = var.aws_default_region
+    nomad_bootstrap  = var.nomad_instances_count
+    nomad_region     = var.nomad_region
+    nomad_datacenter = var.nomad_datacenter
+    nomad_tag_key    = "Project"
+    nomad_tag_value  = var.main_project_tag
+  }
 
-  nomad_cloud_init_gzip = base64gzip(templatefile("./scripts/cloud-init.tftpl", { cloud_init_parts = local.nomad_cloud_init_parts_rendered }))
+  nomad_cloud_init = <<-EOT
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="MIMEBOUNDARY"
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./scripts/install-hashicorp-repository.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./scripts/install-consul.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./scripts/install-nomad.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./scripts/install-bash-env-consul.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./scripts/install-bash-env-nomad.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${templatefile("./scripts/config-consul-client.sh", local.nomad_vars_consul)}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${templatefile("./scripts/config-nomad-server.sh", local.nomad_vars_nomad)}
+EOT
 }
 
-## Client cloud init
+## vault cloud init
 locals {
-  client_cloud_init_parts = [
-    {
-      filepath     = "./scripts/install-hashicorp-repository.sh"
-      content-type = "text/cloud-boothook"
-      vars         = {}
-    },
-    {
-      filepath     = "./scripts/install-consul.sh"
-      content-type = "text/cloud-boothook"
-      vars         = {}
-    },
-    {
-      filepath     = "./scripts/install-nomad.sh"
-      content-type = "text/cloud-boothook"
-      vars         = {}
-    },
-    {
-      filepath     = "./scripts/install-bash-environment.sh"
-      content-type = "text/x-shellscript"
-      vars         = {}
-    },
-    {
-      filepath     = "./scripts/install-docker.sh"
-      content-type = "text/x-shellscript"
-      vars         = {}
-    },
-    {
-      filepath     = "./scripts/config-nomad-cni.sh"
-      content-type = "text/x-shellscript"
-      vars         = {}
-    },
-    {
-      filepath     = "./scripts/config-consul-client.sh"
-      content-type = "text/x-shellscript"
-      vars = {
-        provider          = "aws"
-        provider_region   = var.aws_default_region
-        consul_datacenter = var.consul_datacenter
-        consul_tag_key    = "Project"
-        consul_tag_value  = var.main_project_tag
-      }
-    },
-    {
-      filepath     = "./scripts/config-nomad-client.sh"
-      content-type = "text/x-shellscript"
-      vars = {
-        provider         = "aws"
-        provider_region  = var.aws_default_region
-        nomad_region     = var.nomad_region
-        nomad_datacenter = var.nomad_datacenter
-        nomad_tag_key    = "Project"
-        nomad_tag_value  = var.main_project_tag
-      }
-    },
-  ]
+  vault_vars_consul = {
+    provider          = "aws"
+    provider_region   = var.aws_default_region
+    consul_bootstrap  = var.consul_instances_count
+    consul_datacenter = var.consul_datacenter
+    consul_tag_key    = "Project"
+    consul_tag_value  = var.main_project_tag
+  }
 
-  client_cloud_init_parts_rendered = [for part in local.client_cloud_init_parts : <<-EOF
-            --MIMEBOUNDARY
-            Content-Transfer-Encoding: 7bit
-            Content-Type: ${part.content-type}
-            Mime-Version: 1.0
-            ${templatefile(part.filepath, part.vars)}
-            EOF
-  ]
+  vault_vars_vault = {
+    provider_region = var.aws_default_region
+    kms_key         = "${aws_kms_key.vault.id}"
+  }
 
-  client_cloud_init_gzip = base64gzip(templatefile("./scripts/cloud-init.tftpl", { cloud_init_parts = local.client_cloud_init_parts_rendered }))
+  vault_cloud_init = <<-EOT
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="MIMEBOUNDARY"
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./scripts/install-hashicorp-repository.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./scripts/install-consul.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./scripts/install-vault.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./scripts/install-bash-env-consul.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./scripts/install-bash-env-vault.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${templatefile("./scripts/config-consul-client.sh", local.vault_vars_consul)}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${templatefile("./scripts/config-vault-server.sh", local.vault_vars_vault)}
+EOT
+}
+
+## client cloud init
+locals {
+  client_vars_consul = {
+    provider          = "aws"
+    provider_region   = var.aws_default_region
+    consul_datacenter = var.consul_datacenter
+    consul_tag_key    = "Project"
+    consul_tag_value  = var.main_project_tag
+  }
+
+  client_vars_nomad = {
+    provider         = "aws"
+    provider_region  = var.aws_default_region
+    nomad_region     = var.nomad_region
+    nomad_datacenter = var.nomad_datacenter
+    nomad_tag_key    = "Project"
+    nomad_tag_value  = var.main_project_tag
+  }
+
+  client_cloud_init = <<-EOT
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="MIMEBOUNDARY"
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./scripts/install-hashicorp-repository.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./scripts/install-consul.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./scripts/install-nomad.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./scripts/install-bash-env-consul.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./scripts/install-bash-env-nomad.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./scripts/install-docker.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./scripts/install-cni.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${templatefile("./scripts/config-consul-client.sh", local.client_vars_consul)}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${templatefile("./scripts/config-nomad-client.sh", local.client_vars_nomad)}
+EOT
+}
+
+## traefik cloud init
+locals {
+  traefik_vars_consul = {
+    provider          = "aws"
+    provider_region   = var.aws_default_region
+    consul_datacenter = var.consul_datacenter
+    consul_tag_key    = "Project"
+    consul_tag_value  = var.main_project_tag
+  }
+
+  traefik_cloud_init = <<-EOT
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="MIMEBOUNDARY"
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./scripts/install-hashicorp-repository.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./scripts/install-consul.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./scripts/install-bash-env-consul.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./scripts/install-traefik.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${templatefile("./scripts/config-consul-client.sh", local.traefik_vars_consul)}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./scripts/config-traefik.sh")}
+
+EOT
 }

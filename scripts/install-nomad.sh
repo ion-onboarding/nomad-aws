@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 
-# install latest nomad version
-DEBIAN_FRONTEND=noninteractive apt-get install -y -qq nomad
+# internet reachable? before continue
+for i in {1..15}; do ping -c1 www.google.com &> /dev/null && break; done
 
-# empty default config
-echo "" | tee /etc/nomad.d/nomad.hcl
+# update
+apt-get update -qq >/dev/null
+
+# install latest version
+DEBIAN_FRONTEND=noninteractive apt-get install -y -qq nomad
