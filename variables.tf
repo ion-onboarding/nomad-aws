@@ -79,7 +79,7 @@ variable "allowed_traffic_cidr_blocks_ipv6" {
 ## Nomad Variables
 variable "nomad_instances_count" {
   description = "How many servers must come online"
-  default     = 1
+  default     = 3
 }
 
 variable "nomad_region" {
@@ -100,7 +100,7 @@ variable "nomad_instance_type" {
 ## Consul Variables
 variable "consul_instances_count" {
   description = "How many servers must come online. At this moment count cannot be changed"
-  default     = 1
+  default     = 3
 }
 
 variable "consul_datacenter" {
@@ -116,7 +116,7 @@ variable "consul_instance_type" {
 ## Vault Variables
 variable "vault_instances_count" {
   description = "How many servers must come online"
-  default     = 1
+  default     = 3
 }
 
 variable "vault_instance_type" {
@@ -132,7 +132,7 @@ variable "client_instance_type" {
 
 variable "client_instances_count" {
   description = "How many servers must come online"
-  default     = 1
+  default     = 5
 }
 
 ## Bastion enable disable

@@ -58,8 +58,14 @@ resource "aws_instance" "vault" {
 
   tags = merge(
     { "Name" = "${var.main_project_tag}-vault" },
-    { "Project" = "${var.main_project_tag}-vault" }
+    { "Project" = "${var.main_project_tag}-vault" },
+    { "instance-number" = "${count.index}" },
   )
+
+  metadata_options {
+    http_endpoint          = "enabled"
+    instance_metadata_tags = "enabled"
+  }
 
   user_data = local.vault_cloud_init
 }

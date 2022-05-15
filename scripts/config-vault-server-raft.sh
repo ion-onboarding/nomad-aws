@@ -9,7 +9,7 @@ echo "" | tee /etc/vault.d/vault.hcl
 # directory integrated storage
 mkdir -p /opt/vault/
 chown vault:vault /opt/vault/
-PRIVATE_IP=$(curl -sS http://169.254.169.254/latest/meta-data/local-ipv4)
+
 # configuration file
 tee /etc/vault.d/vault.hcl > /dev/null <<EOF
 ui            = true
@@ -19,7 +19,7 @@ cluster_addr = "http://{{ GetInterfaceIP \"ens5\" }}:8201"
 api_addr     = "http://{{ GetInterfaceIP \"ens5\" }}:8200"
 
 listener "tcp" {
-  address     = "{{ GetInterfaceIP \"ens5\" }}:8200"
+  address     = "0.0.0.0:8200"
   tls_disable = "true"
 }
 
@@ -29,19 +29,29 @@ seal "awskms" {
 }
 
 storage "raft" {
-  path    = "/opt/vault/"
+  path    = "/opt/vault/data"
   node_id = "$PRIVATE_IP"
+
+  retry_join {
+    auto_join         = "provider=aws region=${provider_region} tag_key=${vault_tag_key} tag_value=${vault_tag_value}"
+    auto_join_scheme  = "http"
+  }
 }
 EOF
 
+# vault is a service
 systemctl enable vault
 systemctl start vault
 
-# unseal
-export VAULT_ADDR=http://$(curl --silent http://169.254.169.254/latest/meta-data/local-ipv4):8200
+# pull IP
+export PRIVATE_IP=$(curl -sS http://169.254.169.254/latest/meta-data/local-ipv4)
 
+export VAULT_ADDR=http://$PRIVATE_IP:8200
+
+# unseal only one instance
+if [[ $(curl http://169.254.169.254/latest/meta-data/tags/instance/instance-number/) -eq 0 ]] ; then
 # wait untill vault status returns 2 (sealed), https://www.vaultproject.io/docs/commands/status
-while vault status ; ret=$? ; [ $ret -ne 2 ];do echo sleep ; sleep 1; done
+while vault status ; ret=$? ; [ $ret -ne 2 ];do sleep 1; done
 
 # root token & recovery keys
 vault operator init > /etc/vault.d/unseal.txt
@@ -50,10 +60,7 @@ vault operator init > /etc/vault.d/unseal.txt
 export VAULT_TOKEN=$(cat /etc/vault.d/unseal.txt | grep -i token | cut -d' ' -f4)
 
 # wait till vault status returns 0 (unsealed), https://www.vaultproject.io/docs/commands/status
-while vault status ; ret=$? ; [ $ret -ne 0 ];do echo sleep ; sleep 1; done
-
-# pull IP
-PRIVATE_IP=$(curl -sS http://169.254.169.254/latest/meta-data/local-ipv4)
+while vault status ; ret=$? ; [ $ret -ne 0 ];do sleep 1; done
 
 # query health endpoint: 200 - if initialized, unsealed, and active
 IS_200=$(curl -sSL -D -  http://$PRIVATE_IP:8200/v1/sys/health | head -n 1 | cut -d' ' -f2)
@@ -130,3 +137,4 @@ EOF
 
 # attach admin policy to admin
 vault policy write admin admin-policy.hcl
+fi

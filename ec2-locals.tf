@@ -1,4 +1,4 @@
-## consul cloud init
+## consul
 locals {
   consul_vars_consul = {
     provider          = "aws"
@@ -39,7 +39,7 @@ ${templatefile("./scripts/config-consul-server.sh", local.consul_vars_consul)}
 EOT
 }
 
-## nomad clount init
+## nomad
 locals {
   nomad_vars_consul = {
     provider          = "aws"
@@ -93,7 +93,7 @@ ${templatefile("./scripts/config-nomad-server.sh", local.nomad_vars_nomad)}
 EOT
 }
 
-## vault cloud init
+## vault
 locals {
   vault_vars_consul = {
     provider          = "aws"
@@ -107,6 +107,9 @@ locals {
   vault_vars_vault = {
     provider_region = var.aws_default_region
     kms_key         = "${aws_kms_key.vault.id}"
+    provider_region = var.aws_default_region
+    vault_tag_key   = "Project"
+    vault_tag_value = "${var.main_project_tag}-vault"
   }
 
   vault_cloud_init = <<-EOT
@@ -139,11 +142,11 @@ ${templatefile("./scripts/config-consul-client.sh", local.vault_vars_consul)}
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${templatefile("./scripts/config-vault-server.sh", local.vault_vars_vault)}
+${templatefile("./scripts/config-vault-server-raft.sh", local.vault_vars_vault)}
 EOT
 }
 
-## client cloud init
+## client
 locals {
   client_vars_consul = {
     provider          = "aws"
@@ -204,7 +207,7 @@ ${templatefile("./scripts/config-nomad-client.sh", local.client_vars_nomad)}
 EOT
 }
 
-## traefik cloud init
+## traefik
 locals {
   traefik_vars_consul = {
     provider          = "aws"
