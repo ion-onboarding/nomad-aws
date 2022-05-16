@@ -109,6 +109,16 @@ vault login -method=userpass username=admin password=admin
 export VAULT_TOKEN=<token>
 ```
 
+- lookup token being used
+```
+vault token lookup
+```
+
+- servers (raft)
+```
+vault operator raft list-peers
+```
+
 ## Nomad
 - servers
 ```
@@ -123,20 +133,4 @@ nomad node status
 - raft peers
 ```
 nomad operator raft list-peers
-```
-
-## Nomad workloads
-- run a job, which is a web server
-```
-nomad job run examples/web-traefik.nomad
-```
-
-- output URL of LoadBalancer
-```
-terraform output URL_LoadBalancer
-```
-
-- access the web server
-```
-http://<URL_LoadBalancer>/web
 ```

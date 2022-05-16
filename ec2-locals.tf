@@ -49,27 +49,27 @@ Content-Type: multipart/mixed; boundary="MIMEBOUNDARY"
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${file("./scripts/install-hashicorp-repository.sh")}
+${file("./cloud-init/install-hashicorp-repository.sh")}
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${templatefile("./scripts/install-consul.sh", local.install)}
+${templatefile("./cloud-init/install-consul.sh", local.install)}
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${templatefile("./scripts/install-nomad.sh", local.install)}
+${templatefile("./cloud-init/install-nomad.sh", local.install)}
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${file("./scripts/install-bash-env-consul.sh")}
+${file("./cloud-init/install-bash-env-consul.sh")}
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${file("./scripts/install-bash-env-nomad.sh")}
+${file("./cloud-init/install-bash-env-nomad.sh")}
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${templatefile("./scripts/config-consul-server.sh", local.vm_consul_vars_consul)}
+${templatefile("./cloud-init/config-consul-server.sh", local.vm_consul_vars_consul)}
 EOT
 }
 
@@ -100,31 +100,31 @@ Content-Type: multipart/mixed; boundary="MIMEBOUNDARY"
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${file("./scripts/install-hashicorp-repository.sh")}
+${file("./cloud-init/install-hashicorp-repository.sh")}
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${templatefile("./scripts/install-consul.sh", local.install)}
+${templatefile("./cloud-init/install-consul.sh", local.install)}
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${templatefile("./scripts/install-nomad.sh", local.install)}
+${templatefile("./cloud-init/install-nomad.sh", local.install)}
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${file("./scripts/install-bash-env-consul.sh")}
+${file("./cloud-init/install-bash-env-consul.sh")}
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${file("./scripts/install-bash-env-nomad.sh")}
+${file("./cloud-init/install-bash-env-nomad.sh")}
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${templatefile("./scripts/config-consul-client.sh", local.vm_nomad_vars_consul)}
+${templatefile("./cloud-init/config-consul-client.sh", local.vm_nomad_vars_consul)}
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${templatefile("./scripts/config-nomad-server.sh", local.vm_nomad_vars_nomad)}
+${templatefile("./cloud-init/config-nomad-server.sh", local.vm_nomad_vars_nomad)}
 EOT
 }
 
@@ -154,31 +154,31 @@ Content-Type: multipart/mixed; boundary="MIMEBOUNDARY"
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${file("./scripts/install-hashicorp-repository.sh")}
+${file("./cloud-init/install-hashicorp-repository.sh")}
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${templatefile("./scripts/install-consul.sh", local.install)}
+${templatefile("./cloud-init/install-consul.sh", local.install)}
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${templatefile("./scripts/install-vault.sh", local.install)}
+${templatefile("./cloud-init/install-vault.sh", local.install)}
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${file("./scripts/install-bash-env-consul.sh")}
+${file("./cloud-init/install-bash-env-consul.sh")}
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${file("./scripts/install-bash-env-vault.sh")}
+${file("./cloud-init/install-bash-env-vault.sh")}
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${templatefile("./scripts/config-consul-client.sh", local.vm_vault_vars_consul)}
+${templatefile("./cloud-init/config-consul-client.sh", local.vm_vault_vars_consul)}
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${templatefile("./scripts/config-vault-server-raft.sh", local.vm_vault_vars_vault)}
+${templatefile("./cloud-init/config-vault-server-raft.sh", local.vm_vault_vars_vault)}
 EOT
 }
 
@@ -207,39 +207,39 @@ Content-Type: multipart/mixed; boundary="MIMEBOUNDARY"
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${file("./scripts/install-hashicorp-repository.sh")}
+${file("./cloud-init/install-hashicorp-repository.sh")}
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${templatefile("./scripts/install-consul.sh", local.install)}
+${templatefile("./cloud-init/install-consul.sh", local.install)}
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${templatefile("./scripts/install-nomad.sh", local.install)}
+${templatefile("./cloud-init/install-nomad.sh", local.install)}
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${file("./scripts/install-bash-env-consul.sh")}
+${file("./cloud-init/install-bash-env-consul.sh")}
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${file("./scripts/install-bash-env-nomad.sh")}
+${file("./cloud-init/install-bash-env-nomad.sh")}
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${file("./scripts/install-docker.sh")}
+${file("./cloud-init/install-docker.sh")}
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${file("./scripts/install-cni.sh")}
+${file("./cloud-init/install-cni.sh")}
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${templatefile("./scripts/config-consul-client.sh", local.vm_client_vars_consul)}
+${templatefile("./cloud-init/config-consul-client.sh", local.vm_client_vars_consul)}
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${templatefile("./scripts/config-nomad-client.sh", local.vm_client_vars_nomad)}
+${templatefile("./cloud-init/config-nomad-client.sh", local.vm_client_vars_nomad)}
 EOT
 }
 
@@ -259,26 +259,26 @@ Content-Type: multipart/mixed; boundary="MIMEBOUNDARY"
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${file("./scripts/install-hashicorp-repository.sh")}
+${file("./cloud-init/install-hashicorp-repository.sh")}
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${file("./scripts/install-consul.sh")}
+${templatefile("./cloud-init/install-consul.sh", local.install)}
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${file("./scripts/install-bash-env-consul.sh")}
+${file("./cloud-init/install-bash-env-consul.sh")}
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${file("./scripts/install-traefik.sh")}
+${file("./cloud-init/install-traefik.sh")}
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${templatefile("./scripts/config-consul-client.sh", local.vm_traefik_vars_consul)}
+${templatefile("./cloud-init/config-consul-client.sh", local.vm_traefik_vars_consul)}
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${file("./scripts/config-traefik.sh")}
+${file("./cloud-init/config-traefik.sh")}
 EOT
 }

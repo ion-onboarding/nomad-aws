@@ -31,7 +31,7 @@ job "web-traefik" {
           "-listen",
           ":5678",
           "-text",
-          "<h1 style='text-align:center'>Hello World</h1>",
+          "<h1>hello world</h1>",
         ]
       }
     }

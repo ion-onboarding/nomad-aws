@@ -77,73 +77,17 @@ IS_200=$(curl -sSL -D -  http://$PRIVATE_IP:8200/v1/sys/health | head -n 1 | cut
 # continue if HTTP status is 200
 while [[ $IS_200 -ne 200 ]] ; do sleep 1; IS_200=$(curl -sSL -D -  http://$PRIVATE_IP:8200/v1/sys/health | head -n 1 | cut -d' ' -f2) ; done
 
-# enable username/pasword authentication
-vault auth enable userpass
-vault write auth/userpass/users/admin password=admin policies=admin
-
-# admin policy file - https://learn.hashicorp.com/tutorials/vault/policies
-tee admin-policy.hcl <<EOF
-# Read system health check
-path "sys/health"
-{
-  capabilities = ["read", "sudo"]
-}
-
-# Create and manage ACL policies broadly across Vault
-
-# List existing policies
-path "sys/policies/acl"
-{
-  capabilities = ["list"]
-}
-
-# Create and manage ACL policies
-path "sys/policies/acl/*"
-{
+# create a policy with any path allowing all capabilities (root)
+tee root-policy.hcl <<EOF
+path "*" {
   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
-}
-
-# Enable and manage authentication methods broadly across Vault
-
-# Manage auth methods broadly across Vault
-path "auth/*"
-{
-  capabilities = ["create", "read", "update", "delete", "list", "sudo"]
-}
-
-# Create, update, and delete auth methods
-path "sys/auth/*"
-{
-  capabilities = ["create", "update", "delete", "sudo"]
-}
-
-# List auth methods
-path "sys/auth"
-{
-  capabilities = ["read"]
-}
-
-# Enable and manage the key/value secrets engine at `secret/` path
-
-# List, create, update, and delete key/value secrets
-path "secret/*"
-{
-  capabilities = ["create", "read", "update", "delete", "list", "sudo"]
-}
-
-# Manage secrets engines
-path "sys/mounts/*"
-{
-  capabilities = ["create", "read", "update", "delete", "list", "sudo"]
-}
-
-# List existing secrets engines.
-path "sys/mounts"
-{
-  capabilities = ["read"]
 }
 EOF
 
 # attach admin policy to admin
-vault policy write admin admin-policy.hcl
+vault policy write admin-root root-policy.hcl
 fi
+
+# enable username/pasword authentication
+vault auth enable userpass
+vault write auth/userpass/users/admin password=admin policies=admin-root
