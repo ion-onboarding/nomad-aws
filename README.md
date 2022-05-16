@@ -34,7 +34,7 @@ echo "VAULT-LICENSE" > ./licenses/vault.hclic
   - __true__: install enterprise version
   - __false__: install OSS version
 
-See file `ec2-variables.tf`
+see file `ec2-variables.tf`
 
 ## Specific version (optional)
 - install version `x.y.z`
@@ -42,7 +42,7 @@ See file `ec2-variables.tf`
    - nomad: set variable nomad_version=`x.y.z`
    - vault: set variable vault_version=`x.y.z`
 
-See file `ec2-variables.tf`
+see file `ec2-variables.tf`
 
 ## Create infrastructure
 - initialize working directory
@@ -62,9 +62,9 @@ terraform apply
 
 ## How to connect?
 - use terraform output to get:
-  - Load Balancer WWW
+  - Load Balancer www
   - export ENV variables for consul, vault, nomad
-  - SSH details `(if bastion host enabled)`
+  - ssh details `(if bastion host enabled)`
 ```
 terraform output
 ```
