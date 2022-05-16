@@ -89,7 +89,7 @@ consul operator raft list-peers
 ```
 
 ## Vault
-- GUI user password
+- GUI user password (root privilege)
 ```
 username: admin
 password: admin
@@ -134,3 +134,5 @@ nomad node status
 ```
 nomad operator raft list-peers
 ```
+
+- to run nomad jobs drive into __examples__ directory
