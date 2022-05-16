@@ -62,7 +62,7 @@ terraform apply
 
 ## How to connect?
 - use terraform output to get:
-  - Load Balancer www
+  - www load balancer
   - export ENV variables for consul, vault, nomad
   - ssh details `(if bastion host enabled)`
 ```
