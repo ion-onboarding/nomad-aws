@@ -15,6 +15,35 @@ git clone https://github.com/ion-onboarding/nomad-aws.git
 cd nomad-aws
 ```
 
+## License (optional)
+- create license files
+```
+touch ./licenses/consul.hclic
+touch ./licenses/nomad.hclic
+touch ./licenses/vault.hclic
+```
+
+- add license
+```
+echo "CONSUL-LICENSE" > ./licenses/consul.hclic
+echo "NOMAD-LICENSE" > ./licenses/nomad.hclic
+echo "VAULT-LICENSE" > ./licenses/vault.hclic
+```
+
+- modify variables __`consul_enterprise_enabled`__, __`nomad_enterprise_enabled`__ & __`vault_enterprise_enabled`__
+  - __true__: install enterprise version
+  - __false__: install OSS version
+
+see file `ec2-variables.tf`
+
+## Specific version (optional)
+- install version `x.y.z`
+   - consul: set variable consul_version=`x.y.z`
+   - nomad: set variable nomad_version=`x.y.z`
+   - vault: set variable vault_version=`x.y.z`
+
+see file `ec2-variables.tf`
+
 ## Create infrastructure
 - initialize working directory
 ```
@@ -33,9 +62,9 @@ terraform apply
 
 ## How to connect?
 - use terraform output to get:
-  - SSH details
-  - URL to access GUI
-  - ENV variables
+  - www load balancer
+  - export ENV variables for consul, vault, nomad
+  - ssh details `(if bastion host enabled)`
 ```
 terraform output
 ```
@@ -75,6 +104,21 @@ vault status
 vault login -method=userpass username=admin password=admin
 ```
 
+- export VAULT_TOKEN
+```
+export VAULT_TOKEN=<token>
+```
+
+- lookup token being used
+```
+vault token lookup
+```
+
+- servers (raft)
+```
+vault operator raft list-peers
+```
+
 ## Nomad
 - servers
 ```
@@ -89,20 +133,4 @@ nomad node status
 - raft peers
 ```
 nomad operator raft list-peers
-```
-
-## Nomad workloads
-- run a job, which is a web server
-```
-nomad job run examples/web-traefik.nomad
-```
-
-- output URL of LoadBalancer
-```
-terraform output URL_LoadBalancer
-```
-
-- access the web server
-```
-http://<URL_LoadBalancer>/web
 ```

@@ -3,6 +3,11 @@
 # consul installed before configuration
 while [ ! -f /usr/bin/consul ]; do sleep 1; done
 
+# license
+tee /etc/consul.d/consul.hclic > /dev/null <<EOF
+${consul_license}
+EOF
+
 # empty default config
 echo "" | tee /etc/consul.d/consul.hcl
 
@@ -16,6 +21,7 @@ bind_addr   = "{{ GetInterfaceIP \"ens5\" }}"
 client_addr = "0.0.0.0"
 
 server           = true
+license_path     = "/etc/consul.d/consul.hclic"
 raft_protocol    = 3
 bootstrap_expect = ${consul_bootstrap}
 
