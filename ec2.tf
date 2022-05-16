@@ -27,7 +27,7 @@ resource "aws_instance" "consul" {
     { "Project" = var.main_project_tag }
   )
 
-  user_data = local.consul_cloud_init
+  user_data = local.vm_consul_cloud_init
 }
 
 resource "aws_instance" "nomad" {
@@ -44,7 +44,7 @@ resource "aws_instance" "nomad" {
     { "Project" = var.main_project_tag }
   )
 
-  user_data = local.nomad_cloud_init
+  user_data = local.vm_nomad_cloud_init
 }
 
 resource "aws_instance" "vault" {
@@ -67,7 +67,7 @@ resource "aws_instance" "vault" {
     instance_metadata_tags = "enabled"
   }
 
-  user_data = local.vault_cloud_init
+  user_data = local.vm_vault_cloud_init
 }
 
 resource "aws_instance" "client" {
@@ -84,7 +84,7 @@ resource "aws_instance" "client" {
     { "Project" = var.main_project_tag }
   )
 
-  user_data = local.client_cloud_init
+  user_data = local.vm_client_cloud_init
 }
 
 resource "aws_instance" "traefik" {
@@ -102,5 +102,5 @@ resource "aws_instance" "traefik" {
     { "Project" = var.main_project_tag }
   )
 
-  user_data = local.traefik_cloud_init
+  user_data = local.vm_traefik_cloud_init
 }

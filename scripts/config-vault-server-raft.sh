@@ -3,6 +3,11 @@
 # installed before configuration
 while [ ! -f /usr/bin/vault ]; do sleep 1; done
 
+# license
+tee /etc/vault.d/vault.hclic > /dev/null <<EOF
+${vault_license}
+EOF
+
 # empty default config
 echo "" | tee /etc/vault.d/vault.hcl
 
@@ -12,8 +17,12 @@ chown vault:vault /opt/vault/
 
 # configuration file
 tee /etc/vault.d/vault.hcl > /dev/null <<EOF
+# vault server config
 ui            = true
 disable_mlock = true
+
+# if OSS binary is used then the license configuration is ignored
+license_path = "/etc/vault.d/vault.hclic"
 
 cluster_addr = "http://{{ GetInterfaceIP \"ens5\" }}:8201"
 api_addr     = "http://{{ GetInterfaceIP \"ens5\" }}:8200"

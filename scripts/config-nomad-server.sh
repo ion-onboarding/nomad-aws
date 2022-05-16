@@ -3,11 +3,17 @@
 # nomad installed before configuration
 while [ ! -f /usr/bin/nomad ]; do sleep 1; done
 
+# license
+tee /etc/nomad.d/nomad.hclic > /dev/null <<EOF
+${nomad_license}
+EOF
+
 # empty default config
 echo "" | tee /etc/nomad.d/nomad.hcl
 
 # nomad server
 tee /etc/nomad.d/nomad.hcl > /dev/null <<EOF
+# nomad server config
 region = "${nomad_region}"
 datacenter = "${nomad_datacenter}"
 data_dir = "/opt/nomad"
@@ -26,16 +32,14 @@ server {
     retry_max = 5
     retry_interval = "15s"
   }
+
+  # if OSS binary is used then the license configuration is ignored
+  license_path = "/etc/nomad.d/nomad.hclic"
 }
 
 consul {
   address = "127.0.0.1:8500"
 }
-
-# vault {
-#   enabled = true
-#   address = "http://1.2.3.4:8200"
-# }
 EOF
 
 # start nomad
