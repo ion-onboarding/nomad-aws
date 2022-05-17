@@ -23,12 +23,15 @@ locals {
     "ssh -i ${local.private_key} -o StrictHostKeyChecking=no -J ubuntu@${aws_instance.bastion[0].public_ip} ubuntu@${traefik.private_ip}"
   ] : null
 
+  SSH_prometheus = var.bastion_enable ? [for prometheus in aws_instance.prometheus :
+    "ssh -i ${local.private_key} -o StrictHostKeyChecking=no -J ubuntu@${aws_instance.bastion[0].public_ip} ubuntu@${prometheus.private_ip}"
+  ] : null
+
   CONSUL_HTTP_ADDR        = " export CONSUL_HTTP_ADDR='http://${aws_lb.alb_api.dns_name}:8500' "
   NOMAD_ADDR              = " export NOMAD_ADDR='http://${aws_lb.alb_api.dns_name}:4646' "
   VAULT_ADDR              = " export VAULT_ADDR='http://${aws_lb.alb_api.dns_name}:8200' "
   VAULT_GUI_user_password = "admin/admin"
-  WWW_TRAEFIK_dashboard   = "http://${aws_lb.alb_api.dns_name}:8080"
-  URL_LoadBalancer        = aws_lb.alb_api.dns_name
+  WWW_LB                  = " http://${aws_lb.alb_api.dns_name}:80 "
 }
 
 output "SSH_bation" {
@@ -71,10 +74,10 @@ output "VAULT_GUI_user_password" {
   value = local.VAULT_GUI_user_password
 }
 
-output "WWW_TRAEFIK_dashboard" {
-  value = local.WWW_TRAEFIK_dashboard
+output "WWW_LB" {
+  value = local.WWW_LB
 }
 
-output "URL_LoadBalancer" {
-  value = local.URL_LoadBalancer
+output "SSH_prometheus" {
+  value = local.SSH_prometheus
 }

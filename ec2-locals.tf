@@ -1,14 +1,15 @@
 ## install version + license
 locals {
-  consul_license = fileexists("${path.module}/licenses/consul.hclic") ? file("${path.module}/licenses/consul.hclic") : null
-  nomad_license  = fileexists("${path.module}/licenses/nomad.hclic") ? file("${path.module}/licenses/nomad.hclic") : null
-  vault_license  = fileexists("${path.module}/licenses/vault.hclic") ? file("${path.module}/licenses/vault.hclic") : null
+  consul_license = fileexists("${path.module}/licenses/consul.hclic") ? file("${path.module}/licenses/consul.hclic") : ""
+  nomad_license  = fileexists("${path.module}/licenses/nomad.hclic") ? file("${path.module}/licenses/nomad.hclic") : ""
+  vault_license  = fileexists("${path.module}/licenses/vault.hclic") ? file("${path.module}/licenses/vault.hclic") : ""
 
-  # if enterpise enabled pass string "-enteprise"
+  # if enterpise enabled, pass string "-enteprise"
   consul_enterprise = var.consul_enterprise_enabled ? "-enterprise" : ""
   nomad_enterprise  = var.nomad_enterprise_enabled ? "-enterprise" : ""
   vault_enterprise  = var.vault_enterprise_enabled ? "-enterprise" : ""
 
+  # if enterpise enabled, pass string "+ent"
   consul_enterprise_suffix = var.consul_enterprise_enabled ? "+ent" : ""
   nomad_enterprise_suffix  = var.nomad_enterprise_enabled ? "+ent" : ""
   vault_enterprise_suffix  = var.vault_enterprise_enabled ? "+ent" : ""
@@ -18,8 +19,9 @@ locals {
   nomad_version  = var.nomad_version == "" ? "" : "=${var.nomad_version}${local.nomad_enterprise_suffix}"
   vault_version  = var.vault_version == "" ? "" : "=${var.vault_version}${local.vault_enterprise_suffix}"
 
-  # eventually pass to installation strings like consul-enterprise=1.10.1+ent or nomad-enteprise=1.3.0+ent
-  consul_install = "consul${local.consul_enterprise}${local.consul_version}"
+  # if enterprise is not enabled and version string is not provided, then variable consul_install will get assigned "consul" string
+  # eventually consul_install variable can result in a "consul" or "consul-enterprise=1.10.1+ent" strings
+  consul_install = "consul${local.consul_enterprise}${local.consul_version}" 
   nomad_install  = "nomad${local.nomad_enterprise}${local.nomad_version}"
   vault_install  = "vault${local.vault_enterprise}${local.vault_version}"
 
@@ -280,5 +282,22 @@ ${templatefile("./cloud-init/config-consul-client.sh", local.vm_traefik_vars_con
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
 ${file("./cloud-init/config-traefik.sh")}
+EOT
+}
+
+
+locals {
+  vm_prometheus_cloud_init = <<-EOT
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="MIMEBOUNDARY"
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./cloud-init/install-prometheus.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./cloud-init/install-grafana.sh")}
+
 EOT
 }

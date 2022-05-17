@@ -49,7 +49,7 @@ resource "aws_lb_listener" "alb_vault" {
 
 resource "aws_lb_listener" "alb_traefik" {
   load_balancer_arn = aws_lb.alb_api.arn
-  port              = 8080 # nomad
+  port              = 8080 # traefik dashboard
   protocol          = "HTTP"
 
   default_action {
@@ -60,12 +60,34 @@ resource "aws_lb_listener" "alb_traefik" {
 
 resource "aws_lb_listener" "alb_traefik_ap" {
   load_balancer_arn = aws_lb.alb_api.arn
-  port              = 80 # nomad
+  port              = 80 # traefik apps
   protocol          = "HTTP"
 
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.alb_targets_traefik_app.arn
+  }
+}
+
+resource "aws_lb_listener" "alb_prometheus" {
+  load_balancer_arn = aws_lb.alb_api.arn
+  port              = 9090 # prometheus
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.alb_targets_prometheus.arn
+  }
+}
+
+resource "aws_lb_listener" "alb_grafana" {
+  load_balancer_arn = aws_lb.alb_api.arn
+  port              = 3000 # grafana
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.alb_targets_prometheus.arn
   }
 }
 
@@ -149,8 +171,8 @@ resource "aws_lb_target_group" "alb_targets_vault" {
 }
 
 resource "aws_lb_target_group" "alb_targets_traefik" {
-  name_prefix          = "vault-"
-  port                 = 8080 # vault
+  name_prefix          = "tfik-"
+  port                 = 8080 # traefik dashboard
   protocol             = "HTTP"
   vpc_id               = aws_vpc.vpc.id
   deregistration_delay = 30
@@ -160,7 +182,7 @@ resource "aws_lb_target_group" "alb_targets_traefik" {
   # health_check {
   #   enabled             = true
   #   interval            = 10
-  #   path                = "/v1/sys/leader"    // the API health port?
+  #   path                = "/"    // the API health port?
   #   protocol            = "HTTP"              // switch to HTTPS?
   #   timeout             = 5
   #   healthy_threshold   = 3
@@ -175,8 +197,8 @@ resource "aws_lb_target_group" "alb_targets_traefik" {
 }
 
 resource "aws_lb_target_group" "alb_targets_traefik_app" {
-  name_prefix          = "vault-"
-  port                 = 80 # vault
+  name_prefix          = "tfapp-"
+  port                 = 80 # traefik apps
   protocol             = "HTTP"
   vpc_id               = aws_vpc.vpc.id
   deregistration_delay = 30
@@ -196,6 +218,58 @@ resource "aws_lb_target_group" "alb_targets_traefik_app" {
 
   tags = merge(
     { "Name" = "${var.main_project_tag}-tg-traefik-app" },
+    { "Project" = var.main_project_tag }
+  )
+}
+
+resource "aws_lb_target_group" "alb_targets_prometheus" {
+  name_prefix          = "prom-"
+  port                 = 9090 # prometheus
+  protocol             = "HTTP"
+  vpc_id               = aws_vpc.vpc.id
+  deregistration_delay = 30
+  target_type          = "instance"
+
+  # # https://www.nomadproject.io/api-docs/status
+  # health_check {
+  #   enabled             = true
+  #   interval            = 10
+  #   path                = "/" // the nomad API health port?
+  #   protocol            = "HTTP"              // switch to HTTPS?
+  #   timeout             = 5
+  #   healthy_threshold   = 3
+  #   unhealthy_threshold = 3
+  #   matcher             = "200"
+  # }
+
+  tags = merge(
+    { "Name" = "${var.main_project_tag}-tg-prometheus" },
+    { "Project" = var.main_project_tag }
+  )
+}
+
+resource "aws_lb_target_group" "alb_targets_grafana" {
+  name_prefix          = "graf-"
+  port                 = 3000 # grafana
+  protocol             = "HTTP"
+  vpc_id               = aws_vpc.vpc.id
+  deregistration_delay = 30
+  target_type          = "instance"
+
+  # # https://www.nomadproject.io/api-docs/status
+  # health_check {
+  #   enabled             = true
+  #   interval            = 10
+  #   path                = "/" // the nomad API health port?
+  #   protocol            = "HTTP"              // switch to HTTPS?
+  #   timeout             = 5
+  #   healthy_threshold   = 3
+  #   unhealthy_threshold = 3
+  #   matcher             = "200"
+  # }
+
+  tags = merge(
+    { "Name" = "${var.main_project_tag}-tg-grafana" },
     { "Project" = var.main_project_tag }
   )
 }
@@ -234,5 +308,19 @@ resource "aws_lb_target_group_attachment" "traefik_app" {
   target_group_arn = aws_lb_target_group.alb_targets_traefik_app.arn
   target_id        = aws_instance.traefik[count.index].id
   port             = 80
+}
+
+resource "aws_lb_target_group_attachment" "prometheus" {
+  count            = 1
+  target_group_arn = aws_lb_target_group.alb_targets_prometheus.arn
+  target_id        = aws_instance.prometheus[count.index].id
+  port             = 9090
+}
+
+resource "aws_lb_target_group_attachment" "grafana" {
+  count            = 1
+  target_group_arn = aws_lb_target_group.alb_targets_prometheus.arn
+  target_id        = aws_instance.prometheus[count.index].id
+  port             = 3000
 }
 

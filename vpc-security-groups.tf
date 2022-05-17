@@ -97,6 +97,28 @@ resource "aws_security_group_rule" "load_balancer_allow_traefik_app" {
   description       = "Allow HTTP traffic."
 }
 
+resource "aws_security_group_rule" "load_balancer_allow_prometheus" {
+  security_group_id = aws_security_group.load_balancer.id
+  type              = "ingress"
+  protocol          = "tcp"
+  from_port         = 9090
+  to_port           = 9090
+  cidr_blocks       = var.allowed_traffic_cidr_blocks
+  ipv6_cidr_blocks  = length(var.allowed_traffic_cidr_blocks_ipv6) > 0 ? var.allowed_traffic_cidr_blocks_ipv6 : null
+  description       = "Allow HTTP traffic."
+}
+
+resource "aws_security_group_rule" "load_balancer_allow_grafana" {
+  security_group_id = aws_security_group.load_balancer.id
+  type              = "ingress"
+  protocol          = "tcp"
+  from_port         = 3000
+  to_port           = 3000
+  cidr_blocks       = var.allowed_traffic_cidr_blocks
+  ipv6_cidr_blocks  = length(var.allowed_traffic_cidr_blocks_ipv6) > 0 ? var.allowed_traffic_cidr_blocks_ipv6 : null
+  description       = "Allow HTTP traffic."
+}
+
 resource "aws_security_group_rule" "load_balancer_allow_outbound" {
   security_group_id = aws_security_group.load_balancer.id
   type              = "egress"
