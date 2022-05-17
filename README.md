@@ -15,7 +15,13 @@ git clone https://github.com/ion-onboarding/nomad-aws.git
 cd nomad-aws
 ```
 
-## License (optional)
+## Version & License (optional)
+- check `ec2-variables.tf`
+- install version `x.y.z`
+   - consul: set variable consul_version=`x.y.z`
+   - nomad: set variable nomad_version=`x.y.z`
+   - vault: set variable vault_version=`x.y.z`
+
 - create license files
 ```
 touch ./licenses/consul.hclic
@@ -30,19 +36,10 @@ echo "NOMAD-LICENSE" > ./licenses/nomad.hclic
 echo "VAULT-LICENSE" > ./licenses/vault.hclic
 ```
 
-- modify variables __`consul_enterprise_enabled`__, __`nomad_enterprise_enabled`__ & __`vault_enterprise_enabled`__
-  - __true__: install enterprise version
-  - __false__: install OSS version
-
-see file `ec2-variables.tf`
-
-## Specific version (optional)
-- install version `x.y.z`
-   - consul: set variable consul_version=`x.y.z`
-   - nomad: set variable nomad_version=`x.y.z`
-   - vault: set variable vault_version=`x.y.z`
-
-see file `ec2-variables.tf`
+- modify
+  -  variables __consul_enterprise_enabled__, __nomad_enterprise_enabled__ & __vault_enterprise_enabled__
+    - __true__: install enterprise version
+    - __false__: install OSS version
 
 ## Create infrastructure
 - initialize working directory
