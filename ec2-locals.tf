@@ -72,6 +72,10 @@ ${file("./cloud-init/install-bash-env-nomad.sh")}
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
 ${templatefile("./cloud-init/config-consul-server.sh", local.vm_consul_vars_consul)}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./cloud-init/install-prometheus-node-exporter.sh")}
 EOT
 }
 
@@ -127,6 +131,10 @@ ${templatefile("./cloud-init/config-consul-client.sh", local.vm_nomad_vars_consu
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
 ${templatefile("./cloud-init/config-nomad-server.sh", local.vm_nomad_vars_nomad)}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./cloud-init/install-prometheus-node-exporter.sh")}
 EOT
 }
 
@@ -181,6 +189,11 @@ ${templatefile("./cloud-init/config-consul-client.sh", local.vm_vault_vars_consu
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
 ${templatefile("./cloud-init/config-vault-server-raft.sh", local.vm_vault_vars_vault)}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./cloud-init/install-prometheus-node-exporter.sh")}
+
 EOT
 }
 
@@ -242,6 +255,11 @@ ${templatefile("./cloud-init/config-consul-client.sh", local.vm_client_vars_cons
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
 ${templatefile("./cloud-init/config-nomad-client.sh", local.vm_client_vars_nomad)}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./cloud-init/install-prometheus-node-exporter.sh")}
+
 EOT
 }
 
@@ -282,22 +300,50 @@ ${templatefile("./cloud-init/config-consul-client.sh", local.vm_traefik_vars_con
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
 ${file("./cloud-init/config-traefik.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./cloud-init/install-prometheus-node-exporter.sh")}
 EOT
 }
 
 
 locals {
+  vm_prometheus_vars_consul = {
+    provider          = "aws"
+    provider_region   = var.aws_default_region
+    consul_datacenter = var.consul_datacenter
+    consul_tag_key    = "Project"
+    consul_tag_value  = var.main_project_tag
+  }
+ 
   vm_prometheus_cloud_init = <<-EOT
 MIME-Version: 1.0
 Content-Type: multipart/mixed; boundary="MIMEBOUNDARY"
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${file("./cloud-init/install-prometheus.sh")}
+${file("./cloud-init/install-hashicorp-repository.sh")}
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
-${file("./cloud-init/install-grafana.sh")}
+${templatefile("./cloud-init/install-consul.sh", local.install)}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./cloud-init/install-bash-env-consul.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${templatefile("./cloud-init/config-consul-client.sh", local.vm_prometheus_vars_consul)}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./cloud-init/install-prometheus-node-exporter.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${templatefile("./cloud-init/install-prometheus.sh", {})}
 
 EOT
 }

@@ -95,7 +95,6 @@ resource "aws_instance" "traefik" {
   vpc_security_group_ids = [aws_security_group.any.id]
   subnet_id              = element(aws_subnet.private[*].id, count.index) # first instance 1st AZ, 2nd instance 2nd AZ etc
   iam_instance_profile   = aws_iam_instance_profile.cloud_auto_join.name
-  # associate_public_ip_address = true
 
   tags = merge(
     { "Name" = "${var.main_project_tag}-traefik" },
@@ -112,8 +111,7 @@ resource "aws_instance" "prometheus" {
   key_name               = aws_key_pair.public_key.id
   vpc_security_group_ids = [aws_security_group.any.id]
   subnet_id              = element(aws_subnet.private[*].id, count.index) # first instance 1st AZ, 2nd instance 2nd AZ etc
-  # iam_instance_profile   = aws_iam_instance_profile.cloud_auto_join.name
-  # associate_public_ip_address = true
+  iam_instance_profile   = aws_iam_instance_profile.cloud_auto_join.name
 
   tags = merge(
     { "Name" = "${var.main_project_tag}-prometheus" },
