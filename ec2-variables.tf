@@ -113,5 +113,5 @@ variable "client_instances_count" {
 variable "bastion_enable" {
   description = "true => install bastion host, false => do not install bastion host"
   type        = bool
-  default     = "true"
+  default     = "false"
 }

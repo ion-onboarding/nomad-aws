@@ -30,7 +30,7 @@ locals {
   CONSUL_HTTP_ADDR        = " export CONSUL_HTTP_ADDR='http://${aws_lb.alb_api.dns_name}:8500' "
   NOMAD_ADDR              = " export NOMAD_ADDR='http://${aws_lb.alb_api.dns_name}:4646' "
   VAULT_ADDR              = " export VAULT_ADDR='http://${aws_lb.alb_api.dns_name}:8200' "
-  VAULT_GUI_user_password = "admin/admin"
+  CREDENTIALS             = ["VAULT_UI = admin/admin", "GRAFANA_UI = admin/admin"]
   WWW_LB                  = " http://${aws_lb.alb_api.dns_name}:80 "
   WWW_GRAFANA             = " http://${aws_lb.alb_api.dns_name}:3000 "
 }
@@ -71,8 +71,8 @@ output "VAULT_ADDR" {
   value = local.VAULT_ADDR
 }
 
-output "VAULT_GUI_user_password" {
-  value = local.VAULT_GUI_user_password
+output "CREDENTIALS" {
+  value = local.CREDENTIALS
 }
 
 output "WWW_LB" {

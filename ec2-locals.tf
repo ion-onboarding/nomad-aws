@@ -275,6 +275,7 @@ locals {
 
   vm_traefik_vars_grafana = {
     root_url = "http://${aws_lb.alb_api.dns_name}:3000"
+    prometheus_url = "httP://${aws_instance.prometheus[0].private_ip}:9090"
   }
 
   vm_traefik_cloud_init = <<-EOT
