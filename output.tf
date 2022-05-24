@@ -32,6 +32,7 @@ locals {
   VAULT_ADDR              = " export VAULT_ADDR='http://${aws_lb.alb_api.dns_name}:8200' "
   VAULT_GUI_user_password = "admin/admin"
   WWW_LB                  = " http://${aws_lb.alb_api.dns_name}:80 "
+  WWW_GRAFANA             = " http://${aws_lb.alb_api.dns_name}:3000 "
 }
 
 output "SSH_bation" {
@@ -76,6 +77,10 @@ output "VAULT_GUI_user_password" {
 
 output "WWW_LB" {
   value = local.WWW_LB
+}
+
+output "WWW_GRAFANA" {
+  value = local.WWW_GRAFANA
 }
 
 output "SSH_prometheus" {

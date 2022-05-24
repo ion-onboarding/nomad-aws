@@ -87,7 +87,7 @@ resource "aws_lb_listener" "alb_grafana" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.alb_targets_prometheus.arn
+    target_group_arn = aws_lb_target_group.alb_targets_grafana.arn
   }
 }
 
@@ -248,31 +248,31 @@ resource "aws_lb_target_group" "alb_targets_prometheus" {
   )
 }
 
-# resource "aws_lb_target_group" "alb_targets_grafana" {
-#   name_prefix          = "graf-"
-#   port                 = 3000 # grafana
-#   protocol             = "HTTP"
-#   vpc_id               = aws_vpc.vpc.id
-#   deregistration_delay = 30
-#   target_type          = "instance"
+resource "aws_lb_target_group" "alb_targets_grafana" {
+  name_prefix          = "graf-"
+  port                 = 3000 # grafana
+  protocol             = "HTTP"
+  vpc_id               = aws_vpc.vpc.id
+  deregistration_delay = 30
+  target_type          = "instance"
 
-#   # # https://www.nomadproject.io/api-docs/status
-#   # health_check {
-#   #   enabled             = true
-#   #   interval            = 10
-#   #   path                = "/" // the nomad API health port?
-#   #   protocol            = "HTTP"              // switch to HTTPS?
-#   #   timeout             = 5
-#   #   healthy_threshold   = 3
-#   #   unhealthy_threshold = 3
-#   #   matcher             = "200"
-#   # }
+  # # https://www.nomadproject.io/api-docs/status
+  # health_check {
+  #   enabled             = true
+  #   interval            = 10
+  #   path                = "/" // the nomad API health port?
+  #   protocol            = "HTTP"              // switch to HTTPS?
+  #   timeout             = 5
+  #   healthy_threshold   = 3
+  #   unhealthy_threshold = 3
+  #   matcher             = "200"
+  # }
 
-#   tags = merge(
-#     { "Name" = "${var.main_project_tag}-tg-grafana" },
-#     { "Project" = var.main_project_tag }
-#   )
-# }
+  tags = merge(
+    { "Name" = "${var.main_project_tag}-tg-grafana" },
+    { "Project" = var.main_project_tag }
+  )
+}
 
 ## Target Group Attachment
 resource "aws_lb_target_group_attachment" "consul" {
@@ -317,10 +317,9 @@ resource "aws_lb_target_group_attachment" "prometheus" {
   port             = 9090
 }
 
-# resource "aws_lb_target_group_attachment" "grafana" {
-#   count            = 1
-#   target_group_arn = aws_lb_target_group.alb_targets_prometheus.arn
-#   target_id        = aws_instance.prometheus[count.index].id
-#   port             = 3000
-# }
-
+resource "aws_lb_target_group_attachment" "grafana" {
+  count            = 1
+  target_group_arn = aws_lb_target_group.alb_targets_grafana.arn
+  target_id        = aws_instance.traefik[count.index].id
+  port             = 3000
+}

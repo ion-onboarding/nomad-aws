@@ -273,6 +273,10 @@ locals {
     consul_tag_value  = var.main_project_tag
   }
 
+  vm_traefik_vars_grafana = {
+    root_url = "http://${aws_lb.alb_api.dns_name}:3000"
+  }
+
   vm_traefik_cloud_init = <<-EOT
 MIME-Version: 1.0
 Content-Type: multipart/mixed; boundary="MIMEBOUNDARY"
@@ -304,10 +308,20 @@ ${file("./cloud-init/config-traefik.sh")}
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
 ${file("./cloud-init/install-prometheus-node-exporter.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./cloud-init/install-grafana.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${templatefile("./cloud-init/config-grafana.sh", local.vm_traefik_vars_grafana)}
+
 EOT
 }
 
 
+## prometheus & loki
 locals {
   vm_prometheus_vars_consul = {
     provider          = "aws"
@@ -345,5 +359,20 @@ ${file("./cloud-init/install-prometheus-node-exporter.sh")}
 Content-Type: text/x-shellscript
 ${templatefile("./cloud-init/install-prometheus.sh", {})}
 
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${templatefile("./cloud-init/install-loki.sh", {})}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${templatefile("./cloud-init/config-loki.sh", {})}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${templatefile("./cloud-init/install-promtail.sh", {})}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${templatefile("./cloud-init/config-promtail.sh", {})}
 EOT
 }
