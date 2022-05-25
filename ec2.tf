@@ -1,6 +1,6 @@
 resource "aws_instance" "bastion" {
   count                       = var.bastion_enable ? 1 : 0
-  ami                         = data.aws_ami.ubuntu.id
+  ami                         = data.aws_ami.ubuntu-22-jammy.id
   instance_type               = "t3.micro"
   key_name                    = aws_key_pair.public_key.id
   vpc_security_group_ids      = [aws_security_group.bastion.id]
@@ -15,7 +15,7 @@ resource "aws_instance" "bastion" {
 
 resource "aws_instance" "consul" {
   count                  = var.consul_instances_count
-  ami                    = data.aws_ami.ubuntu.id
+  ami                    = data.aws_ami.ubuntu-22-jammy.id
   instance_type          = var.consul_instance_type
   key_name               = aws_key_pair.public_key.id
   vpc_security_group_ids = [aws_security_group.any.id]
@@ -32,7 +32,7 @@ resource "aws_instance" "consul" {
 
 resource "aws_instance" "nomad" {
   count                  = var.nomad_instances_count
-  ami                    = data.aws_ami.ubuntu.id
+  ami                    = data.aws_ami.ubuntu-22-jammy.id
   instance_type          = var.nomad_instance_type
   key_name               = aws_key_pair.public_key.id
   vpc_security_group_ids = [aws_security_group.any.id]
@@ -49,7 +49,7 @@ resource "aws_instance" "nomad" {
 
 resource "aws_instance" "vault" {
   count                  = var.vault_instances_count
-  ami                    = data.aws_ami.ubuntu.id
+  ami                    = data.aws_ami.ubuntu-22-jammy.id
   instance_type          = var.vault_instance_type
   key_name               = aws_key_pair.public_key.id
   vpc_security_group_ids = [aws_security_group.any.id]
@@ -72,7 +72,7 @@ resource "aws_instance" "vault" {
 
 resource "aws_instance" "client" {
   count                  = var.client_instances_count
-  ami                    = data.aws_ami.ubuntu.id
+  ami                    = data.aws_ami.ubuntu-22-jammy.id
   instance_type          = var.client_instance_type
   key_name               = aws_key_pair.public_key.id
   vpc_security_group_ids = [aws_security_group.any.id]
@@ -89,7 +89,7 @@ resource "aws_instance" "client" {
 
 resource "aws_instance" "traefik" {
   count                  = 1
-  ami                    = data.aws_ami.ubuntu.id
+  ami                    = data.aws_ami.ubuntu-22-jammy.id
   instance_type          = "t3.micro"
   key_name               = aws_key_pair.public_key.id
   vpc_security_group_ids = [aws_security_group.any.id]
@@ -106,7 +106,7 @@ resource "aws_instance" "traefik" {
 
 resource "aws_instance" "prometheus" {
   count                  = 1
-  ami                    = data.aws_ami.ubuntu.id
+  ami                    = data.aws_ami.ubuntu-22-jammy.id
   instance_type          = "t3.micro"
   key_name               = aws_key_pair.public_key.id
   vpc_security_group_ids = [aws_security_group.any.id]

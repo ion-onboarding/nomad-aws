@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # internet reachable? before continue
-for i in {1..15}; do ping -c1 www.google.com &> /dev/null && break; done
+until ping4 -c1 releases.hashicorp.com ; do sleep 1; done
 
 # update
 DEBIAN_FRONTEND=noninteractive apt-get update -qq >/dev/null

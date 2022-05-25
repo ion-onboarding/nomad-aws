@@ -40,6 +40,8 @@ telemetry {
   publish_allocation_metrics = true
   publish_node_metrics = true
 }
+
+enable_debug = true   # to be able to extract logs with nomad operator debug
 EOF
 
 # start nomad

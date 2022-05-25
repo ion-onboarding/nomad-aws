@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 # internet reachable? before continue
-for i in {1..15}; do ping -c1 www.google.com &> /dev/null && break; done
+until ping4 -c1 github.com &>/dev/null; do sleep 1; done 
+
 
 # install manually latest version? https://github.com/grafana/loki/releases
 # https://grafana.com/docs/loki/latest/installation/

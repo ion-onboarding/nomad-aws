@@ -27,12 +27,16 @@ locals {
     "ssh -i ${local.private_key} -o StrictHostKeyChecking=no -J ubuntu@${aws_instance.bastion[0].public_ip} ubuntu@${prometheus.private_ip}"
   ] : null
 
-  CONSUL_HTTP_ADDR        = " export CONSUL_HTTP_ADDR='http://${aws_lb.alb_api.dns_name}:8500' "
-  NOMAD_ADDR              = " export NOMAD_ADDR='http://${aws_lb.alb_api.dns_name}:4646' "
-  VAULT_ADDR              = " export VAULT_ADDR='http://${aws_lb.alb_api.dns_name}:8200' "
-  CREDENTIALS             = ["VAULT_UI = admin/admin", "GRAFANA_UI = admin/admin"]
-  WWW_LB                  = " http://${aws_lb.alb_api.dns_name}:80 "
-  WWW_GRAFANA             = " http://${aws_lb.alb_api.dns_name}:3000 "
+  CONSUL_HTTP_ADDR = " export CONSUL_HTTP_ADDR='http://${aws_lb.alb_api.dns_name}:8500' "
+  NOMAD_ADDR       = " export NOMAD_ADDR='http://${aws_lb.alb_api.dns_name}:4646' "
+  VAULT_ADDR       = " export VAULT_ADDR='http://${aws_lb.alb_api.dns_name}:8200' "
+
+  USER_credentials = ["VAULT_UI = admin/admin", "GRAFANA_UI = admin/admin"]
+
+  WWW_lb                = " http://${aws_lb.alb_api.dns_name}:80 "
+  WWW_grafana           = " http://${aws_lb.alb_api.dns_name}:3000 "
+  WWW_prometheus        = " http://${aws_lb.alb_api.dns_name}:9090 "
+  WWW_traefik_dashboard = " http://${aws_lb.alb_api.dns_name}:8080 "
 }
 
 output "SSH_bation" {
@@ -59,6 +63,10 @@ output "SSH_traefik" {
   value = local.SSH_traefik
 }
 
+output "SSH_prometheus" {
+  value = local.WWW_prometheus
+}
+
 output "CONSUL_HTTP_ADDR" {
   value = local.CONSUL_HTTP_ADDR
 }
@@ -71,18 +79,18 @@ output "VAULT_ADDR" {
   value = local.VAULT_ADDR
 }
 
-output "CREDENTIALS" {
-  value = local.CREDENTIALS
+output "USER_credentials" {
+  value = local.USER_credentials
 }
 
 output "WWW_LB" {
-  value = local.WWW_LB
+  value = local.WWW_lb
 }
 
-output "WWW_GRAFANA" {
-  value = local.WWW_GRAFANA
+output "WWW_grafana" {
+  value = local.WWW_grafana
 }
 
-output "SSH_prometheus" {
-  value = local.SSH_prometheus
+output "WWW_traefik_dashboard" {
+  value = local.WWW_traefik_dashboard
 }

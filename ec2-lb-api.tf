@@ -156,8 +156,8 @@ resource "aws_lb_target_group" "alb_targets_vault" {
   health_check {
     enabled             = true
     interval            = 10
-    path                = "/v1/sys/leader"    // the API health port?
-    protocol            = "HTTP"              // switch to HTTPS?
+    path                = "/v1/sys/leader" // the API health port?
+    protocol            = "HTTP"           // switch to HTTPS?
     timeout             = 5
     healthy_threshold   = 3
     unhealthy_threshold = 3

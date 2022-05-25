@@ -1,12 +1,20 @@
 #!/usr/bin/env bash
 
 # internet reachable? before continue
-for i in {1..15}; do ping -c1 8.8.8.8 &> /dev/null && break; done
+until ping4 -c1 github.com ; do sleep 1; done
 
 # install traefik - https://github.com/traefik/traefik/releases
-curl --silent -LO https://github.com/traefik/traefik/releases/download/v2.6.3/traefik_v2.6.3_linux_amd64.tar.gz
-tar -xzf traefik_v2.6.3_linux_amd64.tar.gz traefik
-rm traefik_v2.6.3_linux_amd64.tar.gz
+# curl --silent -LO https://github.com/traefik/traefik/releases/download/v2.6.3/traefik_v2.6.3_linux_amd64.tar.gz
+# tar -xzf traefik_v2.6.3_linux_amd64.tar.gz traefik
+# rm traefik_v2.6.3_linux_amd64.tar.gz
+
+# install manually latest version?
+# https://docs.github.com/en/rest/releases/releases#get-the-latest-release
+apt-get install -y jq
+URL_TRAEFIK_LATEST=$(curl  -sS -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/traefik/traefik/releases/latest | jq '.["assets"][] | select( ."name" | endswith("linux_amd64.tar.gz") ) | .["browser_download_url"]' | tr -d '"')
+curl -sSLO $URL_TRAEFIK_LATEST
+tar -xzf traefik* traefik
+
 
 chown root:root traefik
 chmod 755 traefik

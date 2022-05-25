@@ -21,7 +21,7 @@ locals {
 
   # if enterprise is not enabled and version string is not provided, then variable consul_install will get assigned "consul" string
   # eventually consul_install variable can result in a "consul" or "consul-enterprise=1.10.1+ent" strings
-  consul_install = "consul${local.consul_enterprise}${local.consul_version}" 
+  consul_install = "consul${local.consul_enterprise}${local.consul_version}"
   nomad_install  = "nomad${local.nomad_enterprise}${local.nomad_version}"
   vault_install  = "vault${local.vault_enterprise}${local.vault_version}"
 
@@ -274,7 +274,7 @@ locals {
   }
 
   vm_traefik_vars_grafana = {
-    root_url = "http://${aws_lb.alb_api.dns_name}:3000"
+    root_url       = "http://${aws_lb.alb_api.dns_name}:3000"
     prometheus_url = "httP://${aws_instance.prometheus[0].private_ip}:9090"
   }
 
@@ -331,7 +331,11 @@ locals {
     consul_tag_key    = "Project"
     consul_tag_value  = var.main_project_tag
   }
- 
+
+  vm_prometheus_vars_prometheus = {
+    provider_region = var.aws_default_region
+  }
+
   vm_prometheus_cloud_init = <<-EOT
 MIME-Version: 1.0
 Content-Type: multipart/mixed; boundary="MIMEBOUNDARY"
@@ -359,6 +363,10 @@ ${file("./cloud-init/install-prometheus-node-exporter.sh")}
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
 ${templatefile("./cloud-init/install-prometheus.sh", {})}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${templatefile("./cloud-init/config-prometheus.sh", local.vm_prometheus_vars_prometheus)}
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript

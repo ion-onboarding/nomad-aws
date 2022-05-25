@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # internet reachable? before continue
-for i in {1..15}; do ping -c1 www.google.com &> /dev/null && break; done
+until ping4 -c1 google.com &>/dev/null; do sleep 1; done 
 
 # install from repository [OSS]
 # https://grafana.com/docs/grafana/latest/installation/debian/#install-from-apt-repository

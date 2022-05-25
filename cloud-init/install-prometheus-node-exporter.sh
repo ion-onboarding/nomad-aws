@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 # internet reachable? before continue
-for i in {1..15}; do ping -c1 www.google.com &> /dev/null && break; done
+until ping4 -c1 archive.ubuntu.com &>/dev/null; do sleep 1; done
 
 # update
-DEBIAN_FRONTEND=noninteractive apt-get update -qq >/dev/null
+apt-get update -qq >/dev/null
 
 # install latest version
-DEBIAN_FRONTEND=noninteractive apt-get install -y -qq prometheus-node-exporter
+apt-get install -y -qq prometheus-node-exporter
