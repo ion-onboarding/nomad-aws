@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # loki installed before configuration
-while [ ! -f /usr/bin/loki-linux-amd64 ]; do sleep 1; done
+while [ ! -f /usr/bin/promtail-linux-amd64 ]; do sleep 1; done
 
 # config example from https://raw.githubusercontent.com/grafana/loki/master/cmd/loki/loki-local-config.yaml
 mkdir -p /etc/promtail/
