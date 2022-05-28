@@ -120,3 +120,20 @@ resource "aws_instance" "prometheus" {
 
   user_data = local.vm_prometheus_cloud_init
 }
+
+resource "aws_instance" "loki" {
+  count                  = 1
+  ami                    = data.aws_ami.ubuntu-22-jammy.id
+  instance_type          = "t3.micro"
+  key_name               = aws_key_pair.public_key.id
+  vpc_security_group_ids = [aws_security_group.any.id]
+  subnet_id              = element(aws_subnet.private[*].id, count.index) # first instance 1st AZ, 2nd instance 2nd AZ etc
+  iam_instance_profile   = aws_iam_instance_profile.cloud_auto_join.name
+
+  tags = merge(
+    { "Name" = "${var.main_project_tag}-loki" },
+    { "Project" = var.main_project_tag }
+  )
+
+  user_data = local.vm_loki_cloud_init
+}

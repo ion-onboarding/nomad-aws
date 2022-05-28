@@ -3,18 +3,21 @@
 # loki installed before configuration
 while [ ! -f /usr/bin/promtail-linux-amd64 ]; do sleep 1; done
 
+# query instance specific private ip
+PRIVATE_IP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
+
 # config example from https://raw.githubusercontent.com/grafana/loki/master/cmd/loki/loki-local-config.yaml
 mkdir -p /etc/promtail/
 tee /etc/promtail/config-promtail.yml > /dev/null <<EOF
 server:
   http_listen_port: 9080
-  grpc_listen_port: 0
+  grpc_listen_port: 9096
 
 positions:
   filename: /tmp/positions.yaml
 
 clients:
-  - url: 'http://localhost:3100/loki/api/v1/push'
+  - url: 'http://${loki_ip}:3100/loki/api/v1/push'
 
 scrape_configs:
   - job_name: system
@@ -24,6 +27,7 @@ scrape_configs:
         labels:
           job: varlogs
           __path__: /var/log/*log
+          host: host-$PRIVATE_IP
 EOF
 
 sudo useradd --system promtail

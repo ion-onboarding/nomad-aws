@@ -29,7 +29,6 @@ locals {
     consul = local.consul_install
     nomad  = local.nomad_install
     vault  = local.vault_install
-
   }
 }
 
@@ -43,6 +42,10 @@ locals {
     consul_tag_key    = "Project"
     consul_tag_value  = var.main_project_tag
     consul_license    = local.consul_license
+  }
+
+  vm_consul_vars_promtail = {
+    loki_ip = "${aws_instance.loki[0].private_ip}"
   }
 
   vm_consul_cloud_init = <<-EOT
@@ -76,6 +79,14 @@ ${templatefile("./cloud-init/config-consul-server.sh", local.vm_consul_vars_cons
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
 ${file("./cloud-init/install-prometheus-node-exporter.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${templatefile("./cloud-init/install-promtail.sh", {})}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${templatefile("./cloud-init/config-promtail.sh", local.vm_consul_vars_promtail)}
 EOT
 }
 
@@ -98,6 +109,10 @@ locals {
     nomad_tag_key    = "Project"
     nomad_tag_value  = var.main_project_tag
     nomad_license    = local.nomad_license
+  }
+
+  vm_nomad_vars_promtail = {
+    loki_ip = "${aws_instance.loki[0].private_ip}"
   }
 
   vm_nomad_cloud_init = <<-EOT
@@ -135,6 +150,14 @@ ${templatefile("./cloud-init/config-nomad-server.sh", local.vm_nomad_vars_nomad)
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
 ${file("./cloud-init/install-prometheus-node-exporter.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${templatefile("./cloud-init/install-promtail.sh", {})}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${templatefile("./cloud-init/config-promtail.sh", local.vm_nomad_vars_promtail)}
 EOT
 }
 
@@ -156,6 +179,10 @@ locals {
     vault_tag_key   = "Project"
     vault_tag_value = "${var.main_project_tag}-vault"
     vault_license   = local.vault_license
+  }
+
+  vm_vault_vars_promtail = {
+    loki_ip = "${aws_instance.loki[0].private_ip}"
   }
 
   vm_vault_cloud_init = <<-EOT
@@ -194,6 +221,13 @@ ${templatefile("./cloud-init/config-vault-server-raft.sh", local.vm_vault_vars_v
 Content-Type: text/x-shellscript
 ${file("./cloud-init/install-prometheus-node-exporter.sh")}
 
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${templatefile("./cloud-init/install-promtail.sh", {})}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${templatefile("./cloud-init/config-promtail.sh", local.vm_vault_vars_promtail)}
 EOT
 }
 
@@ -214,6 +248,10 @@ locals {
     nomad_datacenter = var.nomad_datacenter
     nomad_tag_key    = "Project"
     nomad_tag_value  = var.main_project_tag
+  }
+
+  vm_client_vars_promtail = {
+    loki_ip = "${aws_instance.loki[0].private_ip}"
   }
 
   vm_client_cloud_init = <<-EOT
@@ -260,6 +298,13 @@ ${templatefile("./cloud-init/config-nomad-client.sh", local.vm_client_vars_nomad
 Content-Type: text/x-shellscript
 ${file("./cloud-init/install-prometheus-node-exporter.sh")}
 
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${templatefile("./cloud-init/install-promtail.sh", {})}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${templatefile("./cloud-init/config-promtail.sh", local.vm_client_vars_promtail)}
 EOT
 }
 
@@ -275,7 +320,12 @@ locals {
 
   vm_traefik_vars_grafana = {
     root_url       = "http://${aws_lb.alb_api.dns_name}:3000"
-    prometheus_url = "httP://${aws_instance.prometheus[0].private_ip}:9090"
+    prometheus_url = "http://${aws_instance.prometheus[0].private_ip}:9090"
+    loki_url       = "http://${aws_instance.loki[0].private_ip}:3100"
+  }
+
+  vm_traefik_vars_promtail = {
+    loki_ip = "${aws_instance.loki[0].private_ip}"
   }
 
   vm_traefik_cloud_init = <<-EOT
@@ -318,11 +368,18 @@ ${file("./cloud-init/install-grafana.sh")}
 Content-Type: text/x-shellscript
 ${templatefile("./cloud-init/config-grafana.sh", local.vm_traefik_vars_grafana)}
 
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${templatefile("./cloud-init/install-promtail.sh", {})}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${templatefile("./cloud-init/config-promtail.sh", local.vm_traefik_vars_promtail)}
 EOT
 }
 
 
-## prometheus & loki
+## prometheus
 locals {
   vm_prometheus_vars_consul = {
     provider          = "aws"
@@ -334,6 +391,10 @@ locals {
 
   vm_prometheus_vars_prometheus = {
     provider_region = var.aws_default_region
+  }
+
+  vm_prometheus_vars_promtail = {
+    loki_ip = "${aws_instance.loki[0].private_ip}"
   }
 
   vm_prometheus_cloud_init = <<-EOT
@@ -370,18 +431,56 @@ ${templatefile("./cloud-init/config-prometheus.sh", local.vm_prometheus_vars_pro
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
+${templatefile("./cloud-init/install-promtail.sh", {})}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${templatefile("./cloud-init/config-promtail.sh", local.vm_prometheus_vars_promtail)}
+EOT
+}
+
+
+## loki
+locals {
+  vm_loki_vars_consul = {
+    provider          = "aws"
+    provider_region   = var.aws_default_region
+    consul_datacenter = var.consul_datacenter
+    consul_tag_key    = "Project"
+    consul_tag_value  = var.main_project_tag
+  }
+
+  vm_loki_cloud_init = <<-EOT
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="MIMEBOUNDARY"
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./cloud-init/install-hashicorp-repository.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${templatefile("./cloud-init/install-consul.sh", local.install)}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./cloud-init/install-bash-env-consul.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${templatefile("./cloud-init/config-consul-client.sh", local.vm_loki_vars_consul)}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
+${file("./cloud-init/install-prometheus-node-exporter.sh")}
+
+--MIMEBOUNDARY
+Content-Type: text/x-shellscript
 ${templatefile("./cloud-init/install-loki.sh", {})}
 
 --MIMEBOUNDARY
 Content-Type: text/x-shellscript
 ${templatefile("./cloud-init/config-loki.sh", {})}
 
---MIMEBOUNDARY
-Content-Type: text/x-shellscript
-${templatefile("./cloud-init/install-promtail.sh", {})}
-
---MIMEBOUNDARY
-Content-Type: text/x-shellscript
-${templatefile("./cloud-init/config-promtail.sh", {})}
 EOT
 }

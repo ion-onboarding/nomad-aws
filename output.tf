@@ -27,6 +27,10 @@ locals {
     "ssh -i ${local.private_key} -o StrictHostKeyChecking=no -J ubuntu@${aws_instance.bastion[0].public_ip} ubuntu@${prometheus.private_ip}"
   ] : null
 
+  SSH_loki = var.bastion_enable ? [for loki in aws_instance.loki :
+    "ssh -i ${local.private_key} -o StrictHostKeyChecking=no -J ubuntu@${aws_instance.bastion[0].public_ip} ubuntu@${loki.private_ip}"
+  ] : null
+
   CONSUL_HTTP_ADDR = " export CONSUL_HTTP_ADDR='http://${aws_lb.alb_api.dns_name}:8500' "
   NOMAD_ADDR       = " export NOMAD_ADDR='http://${aws_lb.alb_api.dns_name}:4646' "
   VAULT_ADDR       = " export VAULT_ADDR='http://${aws_lb.alb_api.dns_name}:8200' "
@@ -65,6 +69,10 @@ output "SSH_traefik" {
 
 output "SSH_prometheus" {
   value = local.WWW_prometheus
+}
+
+output "SSH_loki" {
+  value = local.SSH_loki
 }
 
 output "CONSUL_HTTP_ADDR" {

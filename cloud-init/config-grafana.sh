@@ -29,6 +29,19 @@ datasources:
   url: ${prometheus_url}
 EOF
 
+# add loki as datasource to grafana
+tee /etc/grafana/provisioning/datasources/datasource-loki.yml > /dev/null <<EOF
+# config file version
+apiVersion: 1
+
+datasources:
+- name: loki
+  type: loki
+  access: server
+  orgId: 1
+  url: ${loki_url}
+EOF
+
 # start grafana
 systemctl enable grafana-server
 systemctl start grafana-server
